@@ -517,4 +517,4 @@ if __name__ == '__main__':
         CFG['flow_data_creation']['protein_id'] = str(args.pid)
 
     # create_prism_score_diff_data()
-    create_prism_score_diff_data(max_v=10)
+    create_prism_score_diff_data(max_v=10)  # will create dumps with only 10 mutations
