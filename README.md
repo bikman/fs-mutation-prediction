@@ -12,6 +12,8 @@ After creation of pickled data with embeddings per protein (might take hours) th
 
 Our model data is created with ESM-1b embedder.
 https://github.com/facebookresearch/esm
+Pretrained LLM for embedder is here:
+https://dl.fbaipublicfiles.com/fair-esm/models/esm_msa1b_t12_100M_UR50S.pt
 
 
 
