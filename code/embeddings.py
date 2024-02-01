@@ -12,7 +12,6 @@ from utils import ESM_MODEL, ESM_REGRESSION, DEVICE
 class EsmEmbedder(object):
     """
     https://github.com/facebookresearch/esm
-    ESM2: EsmEmbedder('esm2_t33_650M_UR50D', model, regression, 33)
     ESM: EsmEmbedder('esm_msa1b_t12_100M_UR50S', model, regression, 12)
     """
 

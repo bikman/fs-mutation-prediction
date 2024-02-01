@@ -1,44 +1,32 @@
 """
-Author: Michael Bikman 
 Module with general utilities.
 """
 
+import configparser
 import logging
 import os
 import sys
 from datetime import datetime
 from sys import platform
-import torch
-import configparser
+
 import numpy as np
+import torch
 from sklearn import preprocessing
 
 # current time
 TIMESTAMP = datetime.now().strftime("%Y_%m_%d-%H_%M_%S_%f")
 REPORT_ROOT = 'reports'
 CONFIG_FILE = 'config.win.ini'
-HOIE_RESULTS = r'hoie_results'
-TAPE_PRETRAINED = r'D:\GIT\MscThesis\tape_pretrain'
-EPISODES_PRETRAINED = r'model_pretrain'
 ESM_MODEL = r'C:\MODELS\esm1b_msa\esm_msa1b_t12_100M_UR50S.pt'
 ESM_REGRESSION = r'C:\MODELS\esm1b_msa\esm_msa1b_t12_100M_UR50S-contact-regression.pt'
-ESM2_MODEL = r'C:\MODELS\esm_2\esm2_t33_650M_UR50D.pt'
-ESM2_REGRESSION = r'C:\MODELS\esm_2\esm2_t33_650M_UR50D-contact-regression.pt'
-DATASETS_FOLDER = r'datasets'
 MODELS_FOLDER = r'models'
 LOG_FOLDER = r'D:\GIT\MscThesis\code\logs'
 RESULTS_PATH = r'D:\RUN_RESULTS'  # windows only
 if platform == "linux" or platform == "linux2":
     REPORT_ROOT = '/root/code/reports'
-    TAPE_PRETRAINED = '/root/code/tape_pretrain'
     ESM_MODEL = r'/root/code/esm_pretrain/esm_msa1b_t12_100M_UR50S.pt'
     ESM_REGRESSION = r'/root/code/esm_pretrain/esm_msa1b_t12_100M_UR50S-contact-regression.pt'
-    ESM2_MODEL = r'/root/code/esm2_pretrain/esm2_t33_650M_UR50D.pt'
-    ESM2_REGRESSION = r'/root/code/esm2_pretrain/esm2_t33_650M_UR50D-contact-regression.pt'
     CONFIG_FILE = '/root/code/config.linux.ini'
-    HOIE_RESULTS = r'/root/code/hoie_results'
-    DATASETS_FOLDER = r'/root/code/datasets'
-    EPISODES_PRETRAINED = r'/root/code/model_pretrain'
     MODELS_FOLDER = r'/root/code/models'
     LOG_FOLDER = r'/root/code/logs'
     RESULTS_PATH = r'/root/code/reports'  # windows only
@@ -237,22 +225,6 @@ MULTITEST_PROTEINS = [
 ]
 
 
-def get_result_folder_from_log(log_path):
-    """
-    Return result folder name from parsed log file
-    @param log_path: full path to log
-    @return: example '2023_03_21-00_55_56_421693_report'
-    """
-    with open(log_path) as file:
-        while line := file.readline():
-            if 'Report path:' in line:
-                tokens = line.split('/')
-                report_folder = tokens[-1].strip()
-                print(f'Found report folder: {report_folder}')
-                return report_folder
-    raise Exception(f'Cannot find report folder name in {log_path}')
-
-
 def get_protein_files_dict():
     """
 
@@ -318,18 +290,6 @@ def normalize_list(values):
     res = transformed.flatten().tolist()
     return res, quantile_transformer
 
-    # -- to be between 0 and 1 --
-    # a_min, a_max = min(values), max(values)
-    # for i, val in enumerate(values):
-    #     values[i] = (val - a_min) / (a_max - a_min)
-    # return values
-
-    # -- to use min max scaling --
-    # from sklearn.preprocessing import MinMaxScaler
-    # scaler = MinMaxScaler(feature_range=(0, 1))
-    # res = scaler.fit_transform([[x] for x in values])
-    # return res.squeeze().tolist()
-
 
 def normalize_scores_ds(data_set):
     """
@@ -376,27 +336,6 @@ def normalize_scores_only(prism_data_list):
             v.score_orig = orig_scores[i]
 
 
-def undo_score_normalization(prism_data_list):
-    """
-    Rewrite normalized score with original scores
-    @param prism_data_list: list of prism data from MAVE files
-    """
-    for prism_data in prism_data_list:
-        for v in prism_data.variants:
-            v.score = v.score_orig
-
-
-def undo_dds_normalization(prism_data_list):
-    """
-    Rewrite normalized deltas with original ones
-    @param prism_data_list: list of prism data from MAVE files
-    """
-    for prism_data in prism_data_list:
-        for v in prism_data.variants:
-            v.ddE = v.ddE_orig
-            v.ddG = v.ddG_orig
-
-
 def get_lr(optimizer):
     return [p['lr'] for p in optimizer.param_groups][0]
 
@@ -429,20 +368,6 @@ def get_embedding_sector(emb_diff, mutation_ndx, step):
     else:
         diff_sector = emb_diff[start_ndx:end_ndx]
     return diff_sector
-
-
-def pad_list_to_count(list_object, count):
-    """
-    Take the last item in the list and pad the result list with it up to size count
-    @param list_object: list to pad
-    @param count: length of the result list
-    @return: new padded list
-    """
-    pad_len = count - len(list_object)
-    if pad_len < 1:
-        return list_object
-    res = list_object + [list_object[-1]] * pad_len
-    return res
 
 
 class TrainParameters(object):
@@ -639,18 +564,6 @@ class TrainResult(object):
                f'R2: {self.test_result.r2}\n' \
                f'Accuracy:\n{str(self.test_result.prediction_accuracy)}\n' \
                '-----------------------------\n'
-
-
-def beep(sec=1):
-    """
-    Will play a 1 second of sound to signal the run ended
-    """
-    if platform == "linux" or platform == "linux2":
-        return
-    import winsound
-    frequency = 440  # Set Frequency in Hertz
-    duration = 1000 * sec  # Set Duration (in ms)
-    winsound.Beep(frequency, duration)
 
 
 def setup_reports(report_type='na'):

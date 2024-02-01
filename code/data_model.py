@@ -7,7 +7,7 @@ import re
 
 import numpy as np
 
-from utils import AMINO_TO_LETTER, pad_list_to_count
+from utils import AMINO_TO_LETTER
 
 
 class Variant(object):
