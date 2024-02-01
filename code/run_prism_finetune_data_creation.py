@@ -14,7 +14,7 @@ from pathlib import Path
 from run_prism_data_creation import parse_prism_score_file, create_seq_embedder, create_seq_embedding_dict, \
     calculate_bins
 from pdb_data import PdbDataParser
-from embeddings import EsmMsaEmbedding, TapeEmbedding, NativeEmbedding
+from embeddings import EsmMsaEmbedding
 from data_model import Variant, PrismScoreData
 from dataset import PrismDiffEmbFineTuneDatasetCreator
 

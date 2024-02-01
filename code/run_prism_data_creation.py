@@ -19,8 +19,7 @@ from data_model import Variant, PrismScoreData
 from dataset import PrismDiffEmbMultisetCreator
 from embeddings import EsmEmbeddingFactory
 from pdb_data import PdbDataParser
-from utils import DEVICE, PRISM_FOLDER, CFG, DUMP_ROOT, \
-    MAX_SEQUENCE, PRISM_EVAL_SPLIT, PRISM_VALID_SPLIT, PRISM_TRAIN_SPLIT, ECOD_FOLDER, get_protein_files_dict, \
+from utils import DEVICE, PRISM_FOLDER, CFG, DUMP_ROOT, MAX_SEQUENCE, ECOD_FOLDER, get_protein_files_dict, \
     normalize_scores_only, MULTITEST_PROTEINS
 from utils import setup_reports, get_embedding_sector, ALL_PROTEIN_FILES_DICT, normalize_deltas_only
 
@@ -94,9 +93,7 @@ def parse_prism_score_file(file_path):
 
 def create_seq_embedder():
     log('Creating sequence embeddings')
-    embedder_type = int(CFG['flow_data_creation']['seq_embedder'])
-    log(f'embedder_type={embedder_type}')
-    sequence_embedder = EsmEmbeddingFactory.get_embedder(embedder_type)
+    sequence_embedder = EsmEmbeddingFactory.get_embedder()
     log(f'Embedder: {sequence_embedder}')
     return sequence_embedder
 
@@ -145,64 +142,6 @@ def _create_per_protein_splits(dss):
     return eval_split, train_split, valid_split
 
 
-def _create_per_protein_named_splits(dss, valid_names, eval_names):
-    """
-    Create evaluation and validation dataset splits according to list of names given by user.
-    @param eval_names: names of proteins to be used in evaluation set
-    @param valid_names: names of proteins to be used in validation set
-    @param dss: all datasets
-    @return: 3 splits for eval, train, and valid
-    """
-    assert len(valid_names) > 0
-    assert len(eval_names) > 0
-    train_split = []
-    valid_split = []
-    eval_split = []
-    for ds in dss:
-        if ds.protein_name in eval_names:
-            eval_split.append(ds)
-        elif ds.protein_name in valid_names:
-            valid_split.append(ds)
-        else:
-            train_split.append(ds)
-    assert len(train_split) > 0
-    assert len(eval_split) == len(eval_names)
-    assert len(valid_split) == len(valid_names)
-    return eval_split, train_split, valid_split
-
-
-def create_prism_diff_emb_data():
-    start_time = time.time()
-    report_path = setup_reports('create_prism_diff_emb_data')
-    log(f'Report path:{report_path}')
-    log(DEVICE)
-
-    log(os.path.basename(__file__))
-    eval_split, train_split, valid_split, pname_to_seq_embedding = create_diff_emb_splits()
-
-    log(f'{DUMP_ROOT=}')
-    if not os.path.exists(DUMP_ROOT):
-        os.makedirs(DUMP_ROOT)
-        log(f'Created: {DUMP_ROOT}')
-    assert os.path.isdir(DUMP_ROOT)
-    dump_path = os.path.join(DUMP_ROOT, PRISM_TRAIN_SPLIT)
-    with open(dump_path, "wb") as f:
-        pickle.dump(train_split, f)
-    log(f'Saved: {dump_path}')
-    dump_path = os.path.join(DUMP_ROOT, PRISM_VALID_SPLIT)
-    with open(dump_path, "wb") as f:
-        pickle.dump(valid_split, f)
-    log(f'Saved: {dump_path}')
-    dump_path = os.path.join(DUMP_ROOT, PRISM_EVAL_SPLIT)
-    with open(dump_path, "wb") as f:
-        pickle.dump(eval_split, f)
-    log(f'Saved: {dump_path}')
-
-    elapsed_time = time.time() - start_time
-    log(f'time: {elapsed_time:5.2f} sec')
-    print('OK')
-
-
 def get_seq_emb_wt(prism_data):
     """
     Create WT sequence embedding
@@ -214,9 +153,7 @@ def get_seq_emb_wt(prism_data):
     wt_sequence = prism_data.sequence
     log(f'Embedding wt protein: {prism_data.protein_name}')
     torch.manual_seed(SEED)
-    embedder_type = int(CFG['flow_data_creation']['seq_embedder'])
-    log(f'embedder_type={embedder_type}')
-    sequence_embedder = EsmEmbeddingFactory.get_embedder(embedder_type)
+    sequence_embedder = EsmEmbeddingFactory.get_embedder()
     emb = sequence_embedder.embed(wt_sequence)
     seq_emb_wt = torch.squeeze(emb)
     return seq_emb_wt
@@ -238,9 +175,7 @@ def get_seq_emb_mut(mutation_ndx, v, wt_sequence):
     assert wt_sequence[mutation_ndx] != mut_sequence[mutation_ndx]
     torch.manual_seed(SEED)
     # we have to create a new embedder every time
-    embedder_type = int(CFG['flow_data_creation']['seq_embedder'])
-    # log(f'embedder_type={embedder_type}')
-    sequence_embedder = EsmEmbeddingFactory.get_embedder(embedder_type)
+    sequence_embedder = EsmEmbeddingFactory.get_embedder()
     emb = sequence_embedder.embed(mut_sequence)
     seq_emb_mut = torch.squeeze(emb)
     return seq_emb_mut
@@ -394,7 +329,7 @@ def _load_diff_embeddings(step=0):
     TBD
     @return:
     """
-    emb_dim = EsmEmbeddingFactory.get_emb_dim(int(CFG['flow_data_creation']['seq_embedder']))
+    emb_dim = EsmEmbeddingFactory.get_emb_dim()
     log('Load PRISM datas')
     use_pdb = int(CFG['general']['use_pdb'])
     log(f'Use PDB: {use_pdb}')
@@ -460,7 +395,6 @@ def create_prism_score_diff_data(max_v=None):
     log(os.path.basename(__file__))
 
     log('=' * 100)
-    log(f"{CFG['flow_data_creation']['seq_embedder']=}")
     log(f"{CFG['general']['dump_root']=}")
     log(f"{CFG['flow_data_creation']['protein_id']=}")
     log(f"{CFG['flow_data_creation']['max_v']=}")
@@ -576,14 +510,11 @@ def create_diff_emb_splits():
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Inputs and setup for data creation')
-    parser.add_argument('-seq_embedder', type=int, help='Sequence embedder type', required=False)
     parser.add_argument('-dump_root', type=str, help='Dump root folder path', required=False)
     parser.add_argument('-pid', type=int, help='Protein to create data for', required=False)
     parser.add_argument('-max_v', type=int, help='Maxi variants in data dump', required=False)
     args = parser.parse_args()
 
-    if args.seq_embedder is not None:
-        CFG['flow_data_creation']['seq_embedder'] = str(args.seq_embedder)
     if args.dump_root is not None:
         CFG['general']['dump_root'] = str(args.dump_root)
     if args.pid is not None:

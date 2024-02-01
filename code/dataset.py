@@ -110,7 +110,7 @@ class PrismStackedDiffEmbDataset(Dataset):
         mutation_ndx = v.position - 1
         emb_sector = get_embedding_sector(seq_emb, mutation_ndx, step)
         assert emb_sector.size()[0] == 2 * step + 1
-        assert emb_sector.size()[1] == EsmEmbeddingFactory.get_emb_dim(int(CFG['flow_data_creation']['seq_embedder']))
+        assert emb_sector.size()[1] == EsmEmbeddingFactory.get_emb_dim()
 
         dst = AA_DICT[v.aa_to]
         src = AA_DICT[v.aa_from]
@@ -374,7 +374,7 @@ if __name__ == '__main__':
 
         with open(dump_path, "rb") as f:
             prism_data = pickle.load(f)
-            sequence_embedder = EsmEmbeddingFactory.get_embedder(1)
+            sequence_embedder = EsmEmbeddingFactory.get_embedder()
             pname_to_seq_embedding = {}
             emb = sequence_embedder.embed(prism_data.sequence)
             seq_embedding = torch.squeeze(emb)

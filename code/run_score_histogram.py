@@ -15,7 +15,7 @@ from matplotlib import pyplot as plt
 from torch.utils.data import random_split
 
 from data_model import Variant, PrismScoreData
-from embeddings import EsmMsaEmbedding, TapeEmbedding, NativeEmbedding
+from embeddings import EsmMsaEmbedding
 from pdb_data import PdbDataParser
 from run_prism_data_creation import get_sequence_from_prism_file, get_variants_from_prism_file
 from utils import DEVICE, PRISM_FOLDER, CFG, ESM_MODEL, ESM_REGRESSION, TAPE_PRETRAINED, \
