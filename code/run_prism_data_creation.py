@@ -1,25 +1,25 @@
 """
 Create pickled files with all variants and diff embeddings per variant
 """
+import argparse
 import logging
 import os
 import pickle
+import random
 import time
 from pathlib import Path
-import argparse
 
+import numpy as np
 import pandas as pd
 import torch
-import random
-from torch.utils.data import random_split, Subset
+from torch.utils.data import random_split
 from tqdm import tqdm
-import numpy as np
 
 from data_model import Variant, PrismScoreData
 from dataset import PrismDiffEmbMultisetCreator
-from embeddings import EsmMsaEmbedding, TapeEmbedding, NativeEmbedding, EsmEmbeddingFactory
+from embeddings import EsmEmbeddingFactory
 from pdb_data import PdbDataParser
-from utils import DEVICE, PRISM_FOLDER, CFG, ESM_MODEL, ESM_REGRESSION, TAPE_PRETRAINED, DUMP_ROOT, \
+from utils import DEVICE, PRISM_FOLDER, CFG, DUMP_ROOT, \
     MAX_SEQUENCE, PRISM_EVAL_SPLIT, PRISM_VALID_SPLIT, PRISM_TRAIN_SPLIT, ECOD_FOLDER, get_protein_files_dict, \
     normalize_scores_only, MULTITEST_PROTEINS
 from utils import setup_reports, get_embedding_sector, ALL_PROTEIN_FILES_DICT, normalize_deltas_only
@@ -118,110 +118,6 @@ def create_seq_embedding_dict(prism_data_list, sequence_embedder):
     return pname_to_seq_embedding
 
 
-def _create_random_splits(dss):
-    """
-    Join all data and then randomly split into train,eval and validation sets
-    @param dss:
-    @return: 3 splits for eval, train, and valid
-    """
-    ds_tuples = []
-    for full_dataset in dss:
-        train_val_size = int(0.9 * len(full_dataset))  # train and validation is 80% together
-        eval_size = len(full_dataset) - train_val_size  # eval is 10%
-        train_val_set, eval_set = random_split(full_dataset, [train_val_size, eval_size])
-        train_size = int(0.8 * len(train_val_set))
-        validation_size = len(train_val_set) - train_size  # validation is 20% from the rest
-        train_set, validation_set = random_split(train_val_set, [train_size, validation_size])
-        ds_tuples.append((train_set, validation_set, eval_set))
-    train_split = [ds for (ds, _, _) in ds_tuples]
-    valid_split = [ds for (_, ds, _) in ds_tuples]
-    eval_split = [ds for (_, _, ds) in ds_tuples]
-    return eval_split, train_split, valid_split
-
-
-def _create_per_position_splits(dss):
-    """
-    Take single protein for evaluation,
-    others join and randomly split into train and validation sets.
-    Validation set is created by position
-    @param dss: data sets list
-    @return: 3 splits for eval, train, and valid
-    """
-    # choose evaluation protein
-    eval_prot_number = int(CFG['general']['eval_protein_file_number'])
-    eval_prot_filename = get_protein_files_dict()[eval_prot_number]
-    log(f'{eval_prot_filename=}')
-    eval_ds = [ds for ds in dss if ds.file_name == eval_prot_filename]
-    assert len(eval_ds) == 1
-    # choose all proteins for train and validation
-    train_val_dss = [ds for ds in dss if ds.file_name != eval_prot_filename]
-    assert len(train_val_dss) == len(dss) - len(eval_ds)
-
-    train_split = []
-    valid_split = []
-    eval_split = eval_ds
-
-    for ds in train_val_dss:
-        positions = list(set([x[1] for x in ds.data]))
-        valid_pos = random.choice(positions)
-        val_indices = [i for i, e in enumerate(ds.data) if e[1] == valid_pos]
-        train_indices = [i for i, e in enumerate(ds.data) if e[1] != valid_pos]
-        valid_ds = Subset(ds, val_indices)
-        train_ds = Subset(ds, train_indices)
-        valid_split.append(valid_ds)
-        train_split.append(train_ds)
-
-    return eval_split, train_split, valid_split
-
-
-def _create_dirty_splits(dss, use_1p_pollution):
-    """
-    Take single protein for evaluation,
-    others join and randomly split into train and validation sets.
-    Eval set is polluted with train data
-    @param dss:
-    @return: 3 splits for eval, train, and valid
-    train split contains small part of evaluation set
-    """
-    eval_prot_number = int(CFG['general']['eval_protein_file_number'])
-    eval_prot_filename = get_protein_files_dict()[eval_prot_number]
-    log(f'{eval_prot_filename=}')
-    eval_ds = [ds for ds in dss if ds.file_name == eval_prot_filename]
-    assert len(eval_ds) == 1
-    train_val_dss = [ds for ds in dss if ds.file_name != eval_prot_filename]
-    assert len(train_val_dss) == len(dss) - len(eval_ds)
-
-    train_split = []
-    valid_split = []
-    for dataset in train_val_dss:
-        train_size = int(0.8 * len(dataset))  # 20 % of train is validation
-        validation_size = len(dataset) - train_size
-        train_set, validation_set = random_split(dataset, [train_size, validation_size])
-        train_split.append(train_set)
-        valid_split.append(validation_set)
-
-    dataset = eval_ds[0]
-
-    # ------------- choose data count for pollution ------------
-    pollution_count = 8
-    if use_1p_pollution:
-        pollution_count = int(0.1 * len(dataset))
-    log(f'{pollution_count=}')
-    # ----------------------------------------------------------
-
-    all_indices = list(range(len(dataset)))
-    random.shuffle(all_indices)
-    pollution_indices = all_indices[:pollution_count]
-    eval_indices = all_indices[pollution_count:]
-    pollution_ds = Subset(dataset, pollution_indices)
-    eval_dataset = Subset(dataset, eval_indices)
-
-    train_split.append(pollution_ds)
-    eval_split = [eval_dataset]
-
-    return eval_split, train_split, valid_split
-
-
 def _create_per_protein_splits(dss):
     """
     Take single protein for evaluation,
@@ -236,9 +132,6 @@ def _create_per_protein_splits(dss):
     assert len(eval_ds) == 1
     train_val_dss = [ds for ds in dss if ds.file_name != eval_prot_filename]
     assert len(train_val_dss) == len(dss) - len(eval_ds)
-
-    # eval_ds = dss[-num_of_eval_sets]
-    # train_val_dss = dss[:-num_of_eval_sets]
 
     train_split = []
     valid_split = []
@@ -550,7 +443,7 @@ def _load_diff_embeddings(step=0):
     return prism_datas
 
 
-def create_prism_score_diff_data():
+def create_prism_score_diff_data(max_v=None):
     """
     Parse PRISM files and create pickled data for further usage
     Prism files are saved into dumps folder, then they loaded during training
@@ -575,8 +468,8 @@ def create_prism_score_diff_data():
 
     diff_len = int(CFG['general']['diff_len'])
     log(f'{diff_len=}')
-
-    max_v = int(CFG['flow_data_creation']['max_v'])
+    if max_v is None:
+        max_v = int(CFG['flow_data_creation']['max_v'])
 
     _save_diff_embeddings(max_v=max_v, step=diff_len)
 
@@ -585,28 +478,6 @@ def create_prism_score_diff_data():
     print('OK')
 
 
-def create_prism_score_diff_data_pdb(max_v=0):
-    """
-    Parse PRISM and PDB files (!!) and create pickled data for further usage
-    @param max_v: for debug use. Set as limit of the number of variants for shorter run-time
-    """
-    start_time = time.time()
-    report_path = setup_reports('score_data_creation')
-    log(f'Report path:{report_path}')
-    log(DEVICE)
-
-    log(os.path.basename(__file__))
-    diff_len = int(CFG['general']['diff_len'])
-    log(f'{diff_len=}')
-
-    _save_diff_embeddings_pdb(max_v, step=diff_len)
-
-    elapsed_time = time.time() - start_time
-    log(f'time: {elapsed_time:5.2f} sec')
-    print('OK')
-
-
-# TODO: move to prism_data_creation module?
 def calculate_bins(prism_data_list):
     """
     Splits list of variants (per protein) to bins
@@ -698,19 +569,7 @@ def create_diff_emb_splits():
             dss = [ds for ds in dss if ds.file_name not in victim_file_names]
     log(f'Number of datasets after filtering: {len(dss)}')
 
-    split_type = int(CFG['flow_data_creation']['split_type'])
-    if split_type == 1:
-        eval_split, train_split, valid_split = _create_per_protein_splits(dss)
-    elif split_type == 2:
-        eval_split, train_split, valid_split = _create_random_splits(dss)
-    elif split_type == 3:
-        eval_split, train_split, valid_split = _create_per_position_splits(dss)
-    elif split_type == 4:
-        eval_split, train_split, valid_split = _create_dirty_splits(dss, False)
-    elif split_type == 5:
-        eval_split, train_split, valid_split = _create_dirty_splits(dss, True)
-    else:
-        raise Exception('Illegal split_type!')
+    eval_split, train_split, valid_split = _create_per_protein_splits(dss)
     return eval_split, train_split, valid_split, pname_to_seq_embedding, prism_data_list
 
 
@@ -732,6 +591,4 @@ if __name__ == '__main__':
     if args.max_v is not None:
         CFG['flow_data_creation']['max_v'] = str(args.max_v)
 
-    create_prism_score_diff_data()
-    # create_prism_score_diff_data_pdb(max_v=-1)
-    pass
+    create_prism_score_diff_data(max_v=10)

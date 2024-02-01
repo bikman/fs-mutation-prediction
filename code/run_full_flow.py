@@ -108,7 +108,6 @@ def main():
     log(f"{CFG['flow_train']['patience']=}")
     log(f"{CFG['general']['bins']=}")
     log(f"{CFG['flow_train']['alpha']=}")
-    log(f"{CFG['flow_data_creation']['split_type']=}")
     log(f"{CFG['flow_data_creation']['normalize_scores']=}")
     log(f"{CFG['fine_tuning_data_creation']['normalize_scores']=}")
     log(f"{CFG['flow_data_creation']['normalize_deltas']=}")
@@ -230,57 +229,26 @@ def main():
     loops = int(CFG['flow_fine_tune']['loops'])
     log(f'{loops=}')
 
-    split_type = int(CFG['flow_data_creation']['split_type'])
-    if split_type <= 3:
-        # --------- Fine tuning part 1 ---------------
-        fine_tune_protein_number = int(CFG['general']['eval_protein_file_number'])
-        protein_filename = get_protein_files_dict()[fine_tune_protein_number]
 
-        # mutations_counts = list of mutation counts
-        mutations_counts = create_fine_tuning_mutation_counts(total_eval_mut_count)
-        log(f'Fine tuning mutation counts: {mutations_counts}')
-        ft_nd_results = run_random_mutations_fine_tuning(
-            mutations_counts, pname_to_seq_embedding, report_path, min_max_eval_v, is_destructive='0', loops=loops)
-        title = f'{protein_filename}: fine tuning - random variants'
-        plotter.create_fine_tune_variants_plot(report_path, 'random_variants', title, mutations_counts, ft_nd_results)
+    # --------- Fine tuning part 1 ---------------
+    fine_tune_protein_number = int(CFG['general']['eval_protein_file_number'])
+    protein_filename = get_protein_files_dict()[fine_tune_protein_number]
 
-        create_result_txt(report_path, protein_filename, test_eval_res, ft_nd_results)
-        log('Result text file created...')
+    # mutations_counts = list of mutation counts
+    mutations_counts = create_fine_tuning_mutation_counts(total_eval_mut_count)
+    log(f'Fine tuning mutation counts: {mutations_counts}')
+    ft_nd_results = run_random_mutations_fine_tuning(
+        mutations_counts, pname_to_seq_embedding, report_path, min_max_eval_v, is_destructive='0', loops=loops)
+    title = f'{protein_filename}: fine tuning - random variants'
+    plotter.create_fine_tune_variants_plot(report_path, 'random_variants', title, mutations_counts, ft_nd_results)
 
-        log('=' * 100)
-        log('Finished fine tune random NON-DESTRUCTIVE mutations training...')
-        log('=' * 100)
-    else:
-        log(f' === Fine Tune SKIPPED ===')
-        eval_protein_number = int(CFG['general']['eval_protein_file_number'])
-        protein_filename = get_protein_files_dict()[eval_protein_number]
-        create_result_txt(report_path, protein_filename, test_eval_res, None)
-        log('Result text file created...')
-
-    """
-    # --------- Fine tuning part 2 ---------------
-    mutations_counts = ['1', '2', '4', '8']
-    ft_des_results = run_random_mutations_fine_tuning(mutations_counts, pname_to_seq_embedding, report_path,
-                                                      is_destructive='1', loops=loops)
-    title = f'{protein_filename}: fine tuning - destructive only'
-    plotter.create_fine_tune_variants_plot(report_path, 'dest_only_variants', title, mutations_counts, ft_des_results)
-    log('=' * 100)
-    log('Finished fine tune random DESTRUCTIVE only mutations training...')
-    log('=' * 100)
-
-    # --------- Fine tuning part 3 ---------------
-    positions_counts = ['1', '2', '3', '4']
-    position_results = run_random_positions_fine_tuning(positions_counts, pname_to_seq_embedding, report_path,
-                                                        loops=loops)
-    title = f'{protein_filename}: fine tuning - whole positions'
-    plotter.create_fine_tune_variants_plot(report_path, 'random_positions', title, positions_counts, position_results)
-    log('=' * 100)
-    log('Finished fine tune random positions mutations training...')
-    log('=' * 100)
-    # -------------------------------------
-    """
+    create_result_txt(report_path, protein_filename, test_eval_res, ft_nd_results)
+    log('Result text file created...')
 
     log('=' * 100)
+    log('Finished fine tune random NON-DESTRUCTIVE mutations training...')
+    log('=' * 100)
+
     try:
         clean_up_large_files(report_path)
         log('Finished cleanup...')
@@ -314,7 +282,6 @@ if __name__ == '__main__':
     parser.add_argument('-patience', type=int, help='When to stop the training', required=False)
     parser.add_argument('-bins', type=int, help='Number of bins to split the data', required=False)
     parser.add_argument('-alpha', type=float, help='Parameter coefficient for loss', required=False)
-    parser.add_argument('-split_type', type=int, help='Split type', required=False)
     parser.add_argument('-norm_scores', type=int, help='Normalize scores train & eval', required=False)
     parser.add_argument('-norm_scores_ft', type=int, help='Normalize scores FT', required=False)
     parser.add_argument('-norm_deltas', type=int, help='Normalize deltas', required=False)
@@ -353,8 +320,6 @@ if __name__ == '__main__':
         CFG['general']['bins'] = str(args.bins)
     if args.alpha is not None:
         CFG['flow_train']['alpha'] = str(args.alpha)
-    if args.split_type is not None:
-        CFG['flow_data_creation']['split_type'] = str(args.split_type)
     if args.norm_scores is not None:
         CFG['flow_data_creation']['normalize_scores'] = str(args.norm_scores)
     if args.norm_scores_ft is not None:
