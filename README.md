@@ -1,2 +1,2 @@
 # fs-mutation-prediction
-Official repository for the paper "FEW-SHOT PREDICTION OF THE EXPERIMENTAL FUNCTIONAL MEASUREMENTS FOR PROTEINS WITH SINGLE POINT MUTATIONS". 
+Official repository for the paper "Few-shot Prediction of the experimental functional measurements for proteins with single point mutations".
