@@ -5,22 +5,16 @@ import logging
 import os
 import pickle
 import time
-import seaborn as sns
 from pathlib import Path
 from statistics import mean
 
 import pandas as pd
-import torch
+import seaborn as sns
 from matplotlib import pyplot as plt
-from torch.utils.data import random_split
 
 from data_model import Variant, PrismScoreData
-from embeddings import EsmMsaEmbedding
-from pdb_data import PdbDataParser
 from run_prism_data_creation import get_sequence_from_prism_file, get_variants_from_prism_file
-from utils import DEVICE, PRISM_FOLDER, CFG, ESM_MODEL, ESM_REGRESSION, TAPE_PRETRAINED, \
-    DUMP_ROOT, normalize_scores_only, MAX_SEQUENCE, PRISM_EVAL_SPLIT, PRISM_VALID_SPLIT, PRISM_TRAIN_SPLIT, \
-    get_protein_files_dict, AA_ALPHABETICAL, ALL_PROTEIN_FILES_DICT
+from utils import DEVICE, PRISM_FOLDER, CFG, get_protein_files_dict, AA_ALPHABETICAL, ALL_PROTEIN_FILES_DICT
 from utils import setup_reports
 
 LOG_ENABLED = True

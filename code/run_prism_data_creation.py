@@ -18,8 +18,7 @@ from tqdm import tqdm
 from data_model import Variant, PrismScoreData
 from dataset import PrismDiffEmbMultisetCreator
 from embeddings import EsmEmbeddingFactory
-from pdb_data import PdbDataParser
-from utils import DEVICE, PRISM_FOLDER, CFG, DUMP_ROOT, MAX_SEQUENCE, ECOD_FOLDER, get_protein_files_dict, \
+from utils import DEVICE, PRISM_FOLDER, CFG, DUMP_ROOT, MAX_SEQUENCE, get_protein_files_dict, \
     normalize_scores_only, MULTITEST_PROTEINS
 from utils import setup_reports, get_embedding_sector, ALL_PROTEIN_FILES_DICT, normalize_deltas_only
 
@@ -268,59 +267,6 @@ def get_diff_sector_pdb(pdb_datas, emb_diff, v, step):
     assert len(neighbors_ndxs) == 2 * step + 1
     assert len(diff_sector) == 2 * step + 1
     return diff_sector
-
-
-def _save_diff_embeddings_pdb(max_v=0, step=0):
-    """
-    Parse MAVE PRISM files, parse PDB files,
-    Use the list of the closest positions from PDB to a mutation location to create embedding diff slice.
-    All the data is then pickled into DUMP folder
-    @param max_v: for debug use. Set as limit of the number of variants for shorter run-time
-    @param step: set the number of neighbors to take
-    """
-    log('Create PDB parser')
-    num_of_neighbors = step * 2 + 1
-    pdb_parser = PdbDataParser(log, num_of_neighbors)
-
-    log('Create PRISM datas from PDB')
-    for f in Path(PRISM_FOLDER).rglob('*.txt'):
-        file_name = os.path.basename(f)
-        if file_name not in get_protein_files_dict().values():
-            continue
-        log(f'Parsing: {file_name}')
-        prism_data = parse_prism_score_file(f)
-        log(prism_data)
-
-        seq_emb_wt = get_seq_emb_wt(prism_data)
-        log(f'WT Emb.shape: {seq_emb_wt.shape}')
-
-        pdb_datas = None
-        for pdb_file in Path(ECOD_FOLDER).rglob('*.pdb'):
-            pdb_protein_name = pdb_parser.get_protein_name_from_pdb_file(pdb_file)
-            if pdb_protein_name in prism_data.protein_name:
-                pdb_datas = pdb_parser.parse_ecod_pdb_file(pdb_file)
-        assert pdb_datas is not None
-        assert len(pdb_datas) > 0
-
-        log(f'Mutating protein: {prism_data.protein_name}')
-        if max_v > 0:
-            log(f'RUNNING SHORT DEBUG DATA CREATION max_v={max_v}')
-            prism_data.variants = prism_data.variants[:max_v]  # for debug only
-        for v in tqdm(prism_data.variants):
-            mutation_ndx = v.position - 1
-            seq_emb_mut = get_seq_emb_mut(mutation_ndx, v, prism_data.sequence)
-            emb_diff = torch.sub(seq_emb_wt, seq_emb_mut)
-            diff_sector = get_diff_sector_pdb(pdb_datas, emb_diff, v, step)
-            assert diff_sector.size()[0] == 2 * step + 1
-            assert diff_sector.size()[1] == EsmEmbeddingFactory.DIMENSION
-            v.emb_diff = diff_sector.numpy()
-
-        # now we have all the mutations with diff embeddings
-        dump_path = os.path.join(CFG['general']['dump_root'], f'{prism_data.file_name}.data.pdb.step_{step}.pkl')
-        log(f'Saving dump: {dump_path}')
-        with open(dump_path, "wb") as dump_f:
-            pickle.dump(prism_data, dump_f)
-        log(f'Saved {dump_path}')
 
 
 def _load_diff_embeddings(step=0):

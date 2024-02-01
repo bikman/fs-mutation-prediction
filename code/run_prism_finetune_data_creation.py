@@ -1,22 +1,20 @@
 """
 Author M.Bikman
 """
-import random
 import logging
-import time
-import torch
-import pickle
-from utils import setup_reports, normalize_scores_only
-from utils import DEVICE, PRISM_FOLDER, CFG, DUMP_ROOT, PRISM_FINE_TRAIN_SPLIT, \
-    PRISM_FINE_EVAL_SPLIT, get_protein_files_dict, normalize_deltas_only, normalize_scores_ds
 import os
+import pickle
+import random
+import time
 from pathlib import Path
-from run_prism_data_creation import parse_prism_score_file, create_seq_embedder, create_seq_embedding_dict, \
-    calculate_bins
-from pdb_data import PdbDataParser
-from embeddings import EsmMsaEmbedding
-from data_model import Variant, PrismScoreData
+
+import torch
+
 from dataset import PrismDiffEmbFineTuneDatasetCreator
+from run_prism_data_creation import parse_prism_score_file, calculate_bins
+from utils import DEVICE, PRISM_FOLDER, CFG, DUMP_ROOT, PRISM_FINE_TRAIN_SPLIT, \
+    PRISM_FINE_EVAL_SPLIT, get_protein_files_dict, normalize_scores_ds
+from utils import setup_reports
 
 LOG_ENABLED = True
 log = print
