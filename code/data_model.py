@@ -1,5 +1,5 @@
 """
-Author: Michael Bikman
+Various classes for data representations
 """
 import itertools
 import math
@@ -63,14 +63,6 @@ class Variant(object):
         self.aa_from = substitution[0]
         self.aa_to = substitution[-1]
 
-    def validate(self):
-        """
-        Check that all values in the fields are between 0 and 1
-        """
-        assert 0 <= self.score <= 1
-        assert 0 <= self.ddE <= 1
-        assert 0 <= self.ddG <= 1
-
     def __str__(self):
         return f'{self.aa_from}->{self.aa_to}@{self.position},{round(self.score, 4)}'
 
@@ -102,116 +94,6 @@ class DebugData(object):
         self.curr_epoch = 0
         self.report_path = None
         self.log = None
-
-
-class ResidueData(object):
-    def __init__(self):
-        self.name = ''  # i.e. TYR
-        self.serial = 0  # index in protein sequence, for example 25
-
-    def load(self, atom):
-        self.serial = atom.parent.id[1]
-        self.name = atom.get_parent().resname
-
-    def __str__(self):
-        return f'{self.serial}:{self.name}'
-
-
-class DistanceMatrix(object):
-    """
-    Represents the Euclidean distances, without skips
-    """
-    pass
-
-    def __init__(self):
-        self.distances = None
-        self.indices_to_serial = None
-        self.serial_to_index = None
-        self.serial_to_closest = None
-
-    def load(self, atoms):
-        self.indices_to_serial = {}
-        self.serial_to_index = {}
-        atoms_count = len(atoms)
-        for pair in enumerate(atoms):
-            index = pair[0]
-            serial = pair[1].parent.id[1]
-            self.indices_to_serial[index] = serial
-            self.serial_to_index[serial] = index
-
-        self.distances = np.zeros((atoms_count, atoms_count))
-        for (atom1, atom2) in itertools.combinations(atoms, 2):
-            distance = self.calc_distance(atom1, atom2)
-            x = self.serial_to_index[atom1.parent.id[1]]
-            y = self.serial_to_index[atom2.parent.id[1]]
-            self.distances[x, y] = distance
-            self.distances[y, x] = distance
-
-    def calculate_closest_serials(self, count):
-        self.serial_to_closest = {}
-
-        for serial, index in self.serial_to_index.items():
-            closest_serials = self._find_closest_serials(serial, count)
-            if len(closest_serials) != count:
-                print(f'For serial={serial} found only {len(closest_serials)} closest serials')
-                closest_serials = pad_list_to_count(closest_serials, count)
-            assert len(closest_serials) == count
-            self.serial_to_closest[serial] = closest_serials
-
-    @staticmethod
-    def calc_distance(atom1, atom2):
-        point1 = np.array(atom1.coord)
-        point2 = np.array(atom2.coord)
-        res = np.linalg.norm(point1 - point2)
-        return res
-
-    def _find_closest_serials(self, src, count):
-        index = self.serial_to_index[src]
-        row = self.distances[index, :]
-        indices = np.argsort(row)[:count]
-        serials = [self.indices_to_serial[i] for i in indices]
-        return serials
-
-
-class ChainData(object):
-    """
-    Data for a single protein chain
-    """
-
-    def __init__(self):
-        self.name = ''  # chain name (for example 'A')
-        self.ca_residues = []
-        self.distance_matrix = None
-        self.seq_embedding = None
-
-    def __str__(self):
-        return f'{[x.name for x in self.ca_residues]}'
-
-    def get_string(self):
-        residues = [x.name for x in self.ca_residues]
-        return ''.join([AMINO_TO_LETTER[r] for r in residues])
-
-
-class ProteinData(object):
-    """
-    Class for parsing the PDB data
-    """
-
-    def __init__(self):
-        self.file = ''  # filename for PDB
-        self.uid = ''  # protein uid, i.e. 00001234@1
-        self.domain = ''  # i.e. 1.1.1.4
-        self.name = ''  # i.e. 2XZV
-        self.chain = None  # chain data object
-
-    def __str__(self):
-        return f'{self.uid}:{self.chain.name}'
-
-    def get_closest_serials(self, serial):
-        if serial in self.chain.distance_matrix.serial_to_closest:
-            return self.chain.distance_matrix.serial_to_closest[serial]
-        else:
-            return None
 
 
 class PrismScoreData:
