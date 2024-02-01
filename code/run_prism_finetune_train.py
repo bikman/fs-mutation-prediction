@@ -12,7 +12,7 @@ from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import DataLoader
 
 from run_prism_finetune_data_creation import create_fine_tune_diff_splits
-from run_prism_score_eval import PlotCreator
+from prism_score_eval import PlotCreator
 from prism_score_train import create_model
 from train import train_prism_fine_tune_multi_sets
 from utils import TrainParameters, CFG, get_protein_files_dict, TrainResult, TestResult, smape

@@ -16,7 +16,7 @@ from run_prism_data_creation import log
 from run_prism_finetune_data_creation import create_fine_tune_diff_splits
 from run_prism_finetune_train import fill_fine_tune_train_params, run_train_fine_tune, calc_train_ft_average_result, \
     calculate_ft_nn_mae
-from run_prism_score_eval import PlotCreator
+from prism_score_eval import PlotCreator
 from prism_score_train import create_model
 from utils import CFG, DEVICE, setup_reports, get_protein_files_dict, MODELS_FOLDER, AA_ALPHABETICAL
 

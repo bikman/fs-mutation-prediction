@@ -1,22 +1,11 @@
 import logging
 import os
 import pickle
-import random
-import time
-
-import numpy as np
-import torch
-from matplotlib import pyplot as plt
 
 from torch.utils.data import DataLoader
-from plots import PlotCreator
-from data_model import ModelConfig, Prediction, PositionPrediction
+
 from train import eval_prism_scores_multi_sets
-from utils import setup_reports, DEVICE, DUMP_ROOT, TrainParameters, CFG, TestParameters
-from utils import PRISM_EVAL_SPLIT, PRISM_TRAIN_SPLIT, PRISM_VALID_SPLIT, PRISM_FINE_EVAL_SPLIT, \
-    HOIE_RESULTS, get_protein_files_dict
-from engine_struct_attn import PrismScoreEmbDiffSimpleModel, PrismScoreDeltasOnlyModel, PrismScoreDeltasEmbDiffModel, \
-    PrismScoreDeltasEmbModel, PrismScoreNoDDGModel, PrismScoreNoDeltasModel, PrismScoreNoDDEModel
+from utils import TestParameters
 
 LOG_ENABLED = True
 log = print
@@ -35,16 +24,6 @@ def run_eval_on_model(batch_size, ds_list, model):
     test_res.model_name = model.file_name
     log(test_res)
     return test_res
-
-
-def load_pickled_split(file_to_eval):
-    log(f'{DUMP_ROOT=}')
-    log(f'Loading data...\n')
-    dump_path = os.path.join(DUMP_ROOT, file_to_eval)
-    with open(dump_path, "rb") as f:
-        eval_split = pickle.load(f)
-    log(f'loaded: {dump_path}\n')
-    return eval_split
 
 
 def pickle_test_result(report_path, run_type, test_res):
