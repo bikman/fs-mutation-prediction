@@ -1,4 +1,5 @@
-
+reports/
 *.pyc
 *.pkl
 *.log
+*.pt
