@@ -1,3 +1,6 @@
+"""
+Model classes
+"""
 import copy
 import os
 from typing import Optional

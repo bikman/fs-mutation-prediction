@@ -17,7 +17,7 @@ from utils import DEVICE, TrainResult, TestResult, CFG, PredictionAccuracy, get_
 
 def normalize_tensor(target):
     """
-    Using quantile transformer 
+    Using quantile transformer
     @param target:
     @return:
     """

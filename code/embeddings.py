@@ -1,3 +1,6 @@
+"""
+Sequence embeddings
+"""
 from sys import platform
 
 import esm

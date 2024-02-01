@@ -1,17 +1,15 @@
 """
-Author: Michael Bikman
+Module for datasets objects creation
 """
 import logging
 import random
 
 import numpy as np
-import torch
 from torch.utils.data import Dataset
 from tqdm import tqdm
-from embeddings import EsmEmbeddingFactory
 
-from utils import AA_ALPHABETICAL, AA_DICT, pad_list_to_count, get_embedding_sector, CFG, get_protein_files_dict, \
-    AA_ALLOWED_MUTATIONS_DICT
+from embeddings import EsmEmbeddingFactory
+from utils import AA_ALPHABETICAL, AA_DICT, get_embedding_sector, CFG, get_protein_files_dict
 
 LOG_ENABLED = True  # put True to enable logging
 
@@ -47,7 +45,7 @@ def get_pid(prism_data):
 
 class PrismStackedDiffEmbDataset(Dataset):
     """
-
+    Dataset class
     """
 
     def __init__(self, prism_data, seq_emb):
@@ -342,54 +340,3 @@ def calculate_bins(prism_data_list):
 
 if __name__ == '__main__':
     pass
-    # assert _calc_row_ndx(70, 69) == 14
-    # assert _calc_row_ndx(70, 70) == 15
-    # assert _calc_row_ndx(70, 71) == 16
-    # assert _calc_row_ndx(10, 11) == 16
-    # assert _calc_row_ndx(10, 9) == 14
-
-    # import os
-    # import pickle
-    # file_name = '002_PTEN_phosphatase_activity.txt.data.step_15.pkl'
-    # dump_path = os.path.join(r'D:\GIT\MscThesis\code\dumps', file_name)
-    # with open(dump_path, "rb") as f:
-    #     prism_data = pickle.load(f)
-    #     ds = PrismStackedDiffEmbDataset(prism_data)
-    #     print(len(ds))
-
-    import os
-    import pickle
-    import random
-    import torch
-
-    random.seed(1234)
-    torch.manual_seed(1234)
-    # ft_count = '16'
-    ft_count = '1p'
-    # ft_count = '256'
-    d = get_protein_files_dict()
-    for pid in d:
-        file_name = d[pid]
-        dump_path = os.path.join(r'D:\GIT\MscThesis\code\dumps', f'{file_name}.data.step_15.pkl')
-
-        with open(dump_path, "rb") as f:
-            prism_data = pickle.load(f)
-            sequence_embedder = EsmEmbeddingFactory.get_embedder()
-            pname_to_seq_embedding = {}
-            emb = sequence_embedder.embed(prism_data.sequence)
-            seq_embedding = torch.squeeze(emb)
-            pname_to_seq_embedding[prism_data.protein_name] = seq_embedding
-            for loop in range(10):
-                dsc = PrismDiffEmbFineTuneDatasetCreator()
-                dsc.prism_data_list = [prism_data]
-                calculate_bins(dsc.prism_data_list)
-                dsc.name_to_seq_emb = pname_to_seq_embedding
-                # -----------------------
-                if ft_count == '1p':
-                    ft_count = int(len(prism_data.variants) * 0.01)
-                dsc.data_count = int(ft_count)
-                # -----------------------
-                dss = dsc.create_datasets()
-                line = ",".join((str(pid), file_name, str(loop), str(dsc.min_sampled_v.score_orig),
-                                 str(dsc.max_sampled_v.score_orig)))
-                print(line)
