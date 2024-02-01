@@ -2,27 +2,24 @@
 Runs training and evaluation BOTH
 """
 import argparse
-import logging
 import os
 import pickle
-import random
 import time
-import torch
-import glob
+
 import numpy
-from utils import CFG, DEVICE, PRISM_EVAL_SPLIT, PRISM_TRAIN_SPLIT, PRISM_VALID_SPLIT, setup_reports, \
-    HOIE_RESULTS, TrainResult, TestResult, get_protein_files_dict, create_result_txt, AA_ALPHABETICAL
-from data_model import Prediction
+import torch
+from sklearn import preprocessing
+from sklearn.metrics import mean_absolute_error
+
+from data_model import Variant
 from run_prism_data_creation import create_diff_emb_splits, log
+from run_prism_finetune_train import run_random_mutations_fine_tuning, clean_up_large_files
+from run_prism_score_eval import run_eval_on_model, PlotCreator, \
+    pickle_test_result
 from run_prism_score_train import fill_train_parameters, run_train, create_acc_loss_plots, create_model, \
     create_loss_batch_plot
-from run_prism_score_eval import load_pickled_split, run_eval_on_model, PlotCreator, \
-    pickle_test_result, load_hoie_result
-from run_prism_finetune_train import run_random_mutations_fine_tuning, run_random_positions_fine_tuning, \
-    clean_up_large_files
-from sklearn.metrics import mean_absolute_error
-from sklearn import preprocessing
-from data_model import Variant
+from utils import CFG, DEVICE, PRISM_EVAL_SPLIT, PRISM_TRAIN_SPLIT, PRISM_VALID_SPLIT, setup_reports, \
+    get_protein_files_dict, create_result_txt, AA_ALPHABETICAL
 
 
 def save_splits(report_path, eval_split, train_split, valid_split):
@@ -49,17 +46,10 @@ def save_splits(report_path, eval_split, train_split, valid_split):
 
 
 def create_fine_tuning_mutation_counts(total_eval_mut_count):
-    # one_perc = int(total_eval_mut_count / 100)
-    # assert one_perc > 4
     two_perc = int(total_eval_mut_count / 50)
     three_perc = int(total_eval_mut_count / 33.3)
     five_perc = int(total_eval_mut_count / 20)
-    # ten_perc = int(total_eval_mut_count / 10)
-    # twenty_perc = int(total_eval_mut_count / 5)
-    # return [str(one_perc), str(two_perc), str(three_perc)]
     return [str(two_perc), str(three_perc), str(five_perc)]
-    # return ['4', '8', '16', str(one_perc), '256']
-    # return ['8', str(one_perc)]
 
 
 def calculate_nn_mae(test_eval_res):
@@ -68,7 +58,7 @@ def calculate_nn_mae(test_eval_res):
     @param test_eval_res: TBD
     """
     test_eval_res.nn_mae = []
-    for perc in [1, 2, 3]:
+    for perc in [2, 3, 5]:
         total_values = len(test_eval_res.true_values)
         selection_len = int(total_values * perc / 100.0)
         sampled_values = numpy.random.choice(test_eval_res.true_values, selection_len, replace=False)
@@ -120,8 +110,6 @@ def main():
     eval_split, train_split, valid_split, pname_to_seq_embedding, prism_data_list = create_diff_emb_splits()
 
     assert len(eval_split) == 1
-    # eval_prism_data = [x for x in prism_data_list if x.file_name == eval_split[0].file_name][0]
-    # eval_quantile_transformer = eval_prism_data.quantile_transformer
     total_eval_mut_count = len(eval_split[0])  # total number of mutations in eval protein
     log(f'{total_eval_mut_count=}')
 
@@ -147,7 +135,6 @@ def main():
     log('Finished training...')
     log('=' * 100)
 
-    hoie_result = load_hoie_result()
     log('=' * 100)
     log('Hoie result loaded...')
     log('=' * 100)
@@ -165,10 +152,7 @@ def main():
 
     # --------- Test split evaluation ---------------
     test_eval_res = run_eval_on_model(batch_size, eval_split, model)
-
     calculate_nn_mae(test_eval_res)
-
-    plotter.create_eval_plots(report_path, test_eval_res, hoie_result)
     pickle_test_result(report_path, 'eval', test_eval_res)
     log('=' * 100)
     log('Finished test evaluation...')
@@ -228,7 +212,6 @@ def main():
 
     loops = int(CFG['flow_fine_tune']['loops'])
     log(f'{loops=}')
-
 
     # --------- Fine tuning part 1 ---------------
     fine_tune_protein_number = int(CFG['general']['eval_protein_file_number'])
@@ -331,6 +314,6 @@ if __name__ == '__main__':
         CFG['flow_train']['batch_norm'] = str(args.batch_norm)
         CFG['flow_fine_tune']['batch_norm'] = str(args.batch_norm)
 
-    # NOTE: print command line args CFG inside main
+    # NOTE: command line args CFG are printed inside main
 
     main()

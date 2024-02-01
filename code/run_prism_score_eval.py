@@ -61,25 +61,5 @@ def pickle_test_result(report_path, run_type, test_res):
     log(f'Saved test result: {dump_path}')
 
 
-def load_hoie_result():
-    """
-    Create result for hoie object
-    @return: loaded result
-    """
-    protein_number = int(CFG['general']['eval_protein_file_number'])
-    protein_file_name = get_protein_files_dict()[protein_number]
-    tokens = (os.path.splitext(protein_file_name)[0]).split('_')
-    file_name_no_ext = '_'.join(tokens[1:])
-    try:
-        dump_path = os.path.join(HOIE_RESULTS, f'{file_name_no_ext}.hoie.result.data.pkl')
-        with open(dump_path, "rb") as f:
-            hoie_result = pickle.load(f)
-        log(f'loaded: {dump_path}')
-        return hoie_result
-    except Exception as e:
-        log(f'error: {e}')
-        raise e
-
-
 if __name__ == '__main__':
     pass
