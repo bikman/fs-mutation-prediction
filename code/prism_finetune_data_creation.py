@@ -1,20 +1,17 @@
 """
-Author M.Bikman
+Logic for creating data for FT flow
 """
 import logging
 import os
 import pickle
 import random
-import time
 from pathlib import Path
 
 import torch
 
 from dataset import PrismDiffEmbFineTuneDatasetCreator
 from run_prism_data_creation import parse_prism_score_file, calculate_bins
-from utils import DEVICE, PRISM_FOLDER, CFG, DUMP_ROOT, PRISM_FINE_TRAIN_SPLIT, \
-    PRISM_FINE_EVAL_SPLIT, get_protein_files_dict, normalize_scores_ds
-from utils import setup_reports
+from utils import PRISM_FOLDER, CFG, DUMP_ROOT, get_protein_files_dict, normalize_scores_ds
 
 LOG_ENABLED = True
 log = print
@@ -29,32 +26,6 @@ if USE_SEED:
     print(f'SEED:{SEED}')
     random.seed(SEED)
     torch.manual_seed(SEED)
-
-
-def create_prism_fine_tune_data():
-    start_time = time.time()
-    report_path = setup_reports('fine_tune_score_train')
-    log(f'Report path:{report_path}')
-    log(DEVICE)
-
-    log(os.path.basename(__file__))
-
-    # eval_ft_split, train_ft_split = create_fine_tune_splits()
-    eval_ft_split, train_ft_split = create_fine_tune_diff_splits()
-
-    log(f'{DUMP_ROOT=}')
-    dump_path = os.path.join(DUMP_ROOT, PRISM_FINE_TRAIN_SPLIT)
-    with open(dump_path, "wb") as f:
-        pickle.dump(train_ft_split, f)
-    log(f'Saved: {dump_path}')
-    dump_path = os.path.join(DUMP_ROOT, PRISM_FINE_EVAL_SPLIT)
-    with open(dump_path, "wb") as f:
-        pickle.dump(eval_ft_split, f)
-    log(f'Saved: {dump_path}')
-
-    elapsed_time = time.time() - start_time
-    log(f'time: {elapsed_time:5.2f} sec')
-    print('OK')
 
 
 def create_fine_tune_diff_splits(pname_to_seq_embedding, min_max_eval_vs=None):
@@ -152,5 +123,4 @@ def create_fine_tune_diff_splits(pname_to_seq_embedding, min_max_eval_vs=None):
 
 
 if __name__ == '__main__':
-    create_prism_fine_tune_data()
     pass

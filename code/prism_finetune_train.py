@@ -1,5 +1,5 @@
 """
-
+Logic for train FT flow
 """
 import glob
 import logging
@@ -11,7 +11,7 @@ from sklearn.metrics import mean_absolute_error
 from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import DataLoader
 
-from run_prism_finetune_data_creation import create_fine_tune_diff_splits
+from prism_finetune_data_creation import create_fine_tune_diff_splits
 from prism_score_eval import PlotCreator
 from prism_score_train import create_model
 from train import train_prism_fine_tune_multi_sets
@@ -75,54 +75,6 @@ def fill_fine_tune_train_params(model, report_path):
     train_params.alpha = float(CFG['flow_fine_tune']['alpha'])
     log(f'Fine tune alpha: {train_params.alpha}')
     return train_params
-
-
-def run_random_positions_fine_tuning(positions_counts, pname_to_seq_embedding, report_path, loops):
-    """
-    TBD
-    @param pname_to_seq_embedding:
-    @param positions_counts:
-    @param report_path:
-    @return:
-    """
-    position_results = []
-    for pos_count in positions_counts:
-        CFG['fine_tuning_data_creation']['eval_data_type'] = '2'  # all mutations per position
-        CFG['fine_tuning_data_creation']['data_count'] = pos_count
-        CFG['fine_tuning_data_creation']['destructive_data_only'] = '0'  # non-destructive only
-
-        tmp_results = []
-        for i in range(0, loops):  # repeat the training
-            model = create_model()
-            model_path = os.path.join(report_path, model.file_name)
-            if not os.path.isfile(model_path):
-                # model doesn't exist in the report path we have NOT run full flow
-                model_path = os.path.join(CFG['flow_fine_tune']['fine_tune_folder'],
-                                          CFG['general']['eval_protein_file_number'], model.file_name)
-            state_dict = torch.load(model_path)
-            model.load_state_dict(state_dict)
-            log('=' * 100)
-            log('Model loaded for fine tuning...')
-            log('=' * 100)
-
-            eval_ft_split, train_ft_split = create_fine_tune_diff_splits(pname_to_seq_embedding)
-            log('Created fine tune splits...')
-            # this will change name is order not to re-write the main trained model!
-            model_file_name = f'{model.file_name}.positions.{pos_count}'
-            log(f'{model_file_name=}')
-            model.file_name = model_file_name
-            log('Updated model name...')
-            train_params = fill_fine_tune_train_params(model, report_path)
-            train_ft_res = run_train_fine_tune(train_ft_split, eval_ft_split, train_params)
-            tmp_results.append(train_ft_res)
-
-        train_average_result = calc_train_ft_average_result(tmp_results)
-        position_results.append(train_average_result)
-        log(train_average_result)
-        log(f'{pos_count=}')
-        log(train_average_result.get_test_results())
-        log('Finished fine tune pos flow...')
-    return position_results
 
 
 def calculate_ft_nn_mae(train_ft_res, eval_ft_quantile_transformer):
