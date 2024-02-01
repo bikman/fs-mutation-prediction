@@ -10,6 +10,8 @@ After creation of pickled data with embeddings per protein (might take hours) th
 
 ### Required libraries
 
-TBD
+Our model data is created with ESM-1b embedder.
+https://github.com/facebookresearch/esm
+
 
 
