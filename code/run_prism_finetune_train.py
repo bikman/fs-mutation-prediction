@@ -1,29 +1,21 @@
 """
 
 """
+import glob
 import logging
 import os
-import pickle
-import random
-import time
-import numpy
-import argparse
-import torch
-import glob
 
-from matplotlib import pyplot as plt
+import numpy
+import torch
+from sklearn.metrics import mean_absolute_error
 from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import DataLoader
-from engine_struct_attn import PrismScoreEmbDiffSimpleModel, PrismScoreEmbDiffModel
-from run_prism_score_train import create_model
-from run_prism_score_eval import PlotCreator
-from run_prism_data_creation import create_diff_emb_splits
+
 from run_prism_finetune_data_creation import create_fine_tune_diff_splits
-from data_model import ModelConfig
+from run_prism_score_eval import PlotCreator
+from run_prism_score_train import create_model
 from train import train_prism_fine_tune_multi_sets
-from utils import setup_reports, DEVICE, DUMP_ROOT, TrainParameters, CFG, PRISM_FINE_TRAIN_SPLIT, FINE_TUNE_FOLDER, \
-    PRISM_FINE_EVAL_SPLIT, get_protein_files_dict, TrainResult, TestResult,smape
-from sklearn.metrics import mean_absolute_error
+from utils import TrainParameters, CFG, get_protein_files_dict, TrainResult, TestResult, smape
 
 LOG_ENABLED = True
 log = print
@@ -267,8 +259,6 @@ def clean_up_large_files(report_path):
     log('clean_up_large_files')
     victims = glob.glob(f'{report_path}/*.pt.mutations.*')
     victims += glob.glob(f'{report_path}/*.pt.positions.*')
-    # victims += glob.glob(f'{report_path}/*.pkl')
-    # victims += glob.glob(f'{report_path}/*.pt')
     log(f'Found {len(victims)} files to clean-up')
     for f in victims:
         try:
