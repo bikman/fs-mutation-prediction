@@ -181,7 +181,7 @@ def get_seq_emb_mut(mutation_ndx, v, wt_sequence):
     return seq_emb_mut
 
 
-def _save_diff_embeddings(max_v=0, step=0):
+def _save_diff_embeddings(max_v, step=0):
     """
     Parse MAVE PRISM files
     Use +-step locations to a mutation position to create embedding diff slice.
@@ -224,7 +224,6 @@ def _save_diff_embeddings(max_v=0, step=0):
             v.emb_diff = diff_sector.cpu().numpy()
 
         # now we have all the mutations with diff embeddings
-
         dump_path = os.path.join(CFG['general']['dump_root'], f'{prism_data.file_name}.data.step_{step}.pkl')
         log(f'Saving dump: {dump_path}')
         with open(dump_path, "wb") as f:
@@ -378,11 +377,12 @@ def _load_diff_embeddings(step=0):
     return prism_datas
 
 
-def create_prism_score_diff_data(max_v=None):
+def create_prism_score_diff_data(max_v=-1):
     """
     Parse PRISM files and create pickled data for further usage
     Prism files are saved into dumps folder, then they loaded during training
-    @param max_v: for debug use. Set as limit of the number of variants for shorter run-time
+    @param max_v: for debug use. Set as limit of the number of variants for shorter run-time.
+    Default value -1 for all variants.
     """
     start_time = time.time()
     report_path = setup_reports('score_data_creation')
@@ -397,13 +397,10 @@ def create_prism_score_diff_data(max_v=None):
     log('=' * 100)
     log(f"{CFG['general']['dump_root']=}")
     log(f"{CFG['flow_data_creation']['protein_id']=}")
-    log(f"{CFG['flow_data_creation']['max_v']=}")
     log('=' * 100)
 
     diff_len = int(CFG['general']['diff_len'])
     log(f'{diff_len=}')
-    if max_v is None:
-        max_v = int(CFG['flow_data_creation']['max_v'])
 
     _save_diff_embeddings(max_v=max_v, step=diff_len)
 
@@ -511,15 +508,13 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Inputs and setup for data creation')
     parser.add_argument('-dump_root', type=str, help='Dump root folder path', required=False)
-    parser.add_argument('-pid', type=int, help='Protein to create data for', required=False)
-    parser.add_argument('-max_v', type=int, help='Maxi variants in data dump', required=False)
+    parser.add_argument('-pid', type=int, help='Protein to create data for (-1 for "all")', required=False)
     args = parser.parse_args()
 
     if args.dump_root is not None:
         CFG['general']['dump_root'] = str(args.dump_root)
     if args.pid is not None:
         CFG['flow_data_creation']['protein_id'] = str(args.pid)
-    if args.max_v is not None:
-        CFG['flow_data_creation']['max_v'] = str(args.max_v)
 
+    # create_prism_score_diff_data()
     create_prism_score_diff_data(max_v=10)
