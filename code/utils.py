@@ -206,7 +206,8 @@ Used for debug only
 # DEBUG_LIST = [1, 2, 39]
 # DEBUG_LIST = [34, 35, 39]
 # DEBUG_LIST = [14, 15, 23, 32, 39]  # Shortest sequences
-DEBUG_LIST = [14, 15, 25, 26, 27, 28, 39]  # Short + multi-test
+DEBUG_LIST = [14, 15, 23, 39]  # Shortest sequences
+# DEBUG_LIST = [14, 15, 25, 26, 27, 28, 39]  # Short + multi-test
 
 # DEBUG_LIST = [19, 20, 21, 29, 31]  # Longest sequences
 # DEBUG_LIST = [x for x in ALL_PROTEINS_LIST if x not in [19, 20, 21, 29, 31]]
