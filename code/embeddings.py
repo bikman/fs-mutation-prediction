@@ -80,15 +80,6 @@ class EsmEmbeddingFactory(object):
 if __name__ == '__main__':
     pass
 
-    print('ESM2')
-    model = r'C:\MODELS\esm_2\esm2_t33_650M_UR50D.pt'
-    regression = r'C:\MODELS\esm_2\esm2_t33_650M_UR50D-contact-regression.pt'
-    embedder = EsmEmbedder('esm2_t33_650M_UR50D', model, regression, 33)
-    seq = 'GTNPLHPNVVSNPVVRLYEQDALRMGKKEQFPYVGTTYRLTEHFHTWTKHALLNAIAQPEQFVEISETLAAAKGINNGDRVTVSSKRGFIRAVAVVTRRL'
-    res = embedder.embed(seq)
-    print(res.shape)
-    print('ok')
-
     print('ESM1b')
     model = r'C:\MODELS\esm1b_msa\esm_msa1b_t12_100M_UR50S.pt'
     regression = r'C:\MODELS\esm1b_msa\esm_msa1b_t12_100M_UR50S-contact-regression.pt'

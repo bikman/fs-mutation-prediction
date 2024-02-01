@@ -8,13 +8,9 @@ import random
 import time
 
 import torch
-from adabelief_pytorch import AdaBelief
-from adabound import adabound
 from matplotlib import pyplot as plt
-from ranger_adabelief import RangerAdaBelief
 from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import DataLoader
-from schedulers import GradualWarmupScheduler
 
 from data_model import ModelConfig
 from engine_struct_attn import PrismScoreEmbDiffSimpleModel, PrismScoreDeltasOnlyModel, PrismScoreDeltasEmbDiffModel, \
