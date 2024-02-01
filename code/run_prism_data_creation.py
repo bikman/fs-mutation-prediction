@@ -230,45 +230,6 @@ def _save_diff_embeddings(max_v, step=0):
         log(f'Saved {dump_path}')
 
 
-def get_diff_sector_pdb(pdb_datas, emb_diff, v, step):
-    """
-    Create partial diff embedding for model according to PDB neighbors, if possible
-    @param pdb_datas: list of pdb data object per chain
-    @param emb_diff: embedding diff (WT - MUT) size (Nres, 768)
-    @param v: mutation variant object
-    @param step: +- number of mutations to check
-    @return: sector of diff embedding of size (step + 1 + step, 768)
-    """
-    neighbors = []  # default
-    # try to find if PDB data has neighbors
-    for pdb_data in pdb_datas:
-        if v.position in pdb_data.chain.distance_matrix.serial_to_closest:
-            neighbors = pdb_data.chain.distance_matrix.serial_to_closest[v.position]
-    if len(neighbors) == 0:  # no neighbors found - take by diff sector by indices +-step
-        return get_embedding_sector(emb_diff, v.position - 1, step)
-    # neighbor positions (1-based) must be converted to indices (0-based)
-    neighbors_ndxs = [i - 1 for i in neighbors if 0 <= i - 1 < len(emb_diff)]  # take only legal positions
-    assert len(neighbors_ndxs) <= 2 * step + 1
-    # --------------------------------------------------------
-    # try:
-    diff_sector = emb_diff[neighbors_ndxs, :]  # take the sector
-    # except:
-    #     pass # for the debug
-    # --------------------------------------------------------
-    # if there were not enough neighbors, there will be not enough columns in sector
-    if len(neighbors_ndxs) < 2 * step + 1:
-        # pad up with zero rows for missing positions
-        pad_count = (2 * step + 1) - len(neighbors_ndxs)
-        assert pad_count > 0
-        neighbors_ndxs = ([0] * pad_count) + neighbors_ndxs
-        padding = torch.nn.ZeroPad2d((0, 0, pad_count, 0))
-        diff_sector = padding(diff_sector)
-    v.neighbors = neighbors_ndxs
-    assert len(neighbors_ndxs) == 2 * step + 1
-    assert len(diff_sector) == 2 * step + 1
-    return diff_sector
-
-
 def _load_diff_embeddings(step=0):
     """
     TBD
@@ -462,5 +423,5 @@ if __name__ == '__main__':
     if args.pid is not None:
         CFG['flow_data_creation']['protein_id'] = str(args.pid)
 
-    # create_prism_score_diff_data()
-    create_prism_score_diff_data(max_v=10)  # will create dumps with only 10 mutations
+    create_prism_score_diff_data()
+    # create_prism_score_diff_data(max_v=10)  # will create dumps with only 10 mutations

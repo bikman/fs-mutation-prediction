@@ -493,6 +493,3 @@ def main():
 if __name__ == '__main__':
     main()
 
-    # tips = sns.load_dataset("tips")
-    # sns.scatterplot(data=tips, x="total_bill", y="tip", hue="time")
-    # plt.show()

@@ -1,21 +1,23 @@
 import math
+import os
 import random
 import time
-import os
+
 import numpy as np
 import torch
 from scipy.stats import pearsonr, spearmanr
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, mean_absolute_percentage_error
-from tqdm import tqdm
-from data_model import DebugData, Variant
-from plots import PlotCreator
 from sklearn import preprocessing
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from tqdm import tqdm
+
+from data_model import DebugData
+from plots import PlotCreator
 from utils import DEVICE, TrainResult, TestResult, CFG, PredictionAccuracy, get_lr, NUM_QUANTILES, smape
 
 
 def normalize_tensor(target):
     """
-    TBD
+    Using quantile transformer 
     @param target:
     @return:
     """
@@ -25,11 +27,6 @@ def normalize_tensor(target):
     transformed = quantile_transformer.fit_transform(x)
     res = torch.from_numpy(transformed.flatten()).to(DEVICE, dtype=torch.float)
     return res
-    # -- old normalization ---
-    # target_min, _ = torch.min(target, dim=0, keepdim=True)
-    # target_max, _ = torch.max(target, dim=0, keepdim=True)
-    # res = (target - target_min) / (target_max - target_min)
-    # return res
 
 
 def train_prism_fine_tune_multi_sets(parameters, log):
@@ -53,7 +50,6 @@ def train_prism_fine_tune_multi_sets(parameters, log):
         # train loop
         log('Train FT')
         for t, train_loader in tqdm(enumerate(parameters.train_loaders_list)):
-            # log(f'Loader:{t}')
             for j, (pid, pos, all_deltas, pos_arr, emb_sector, emb_diff, score, bin_id, score_orig, src, dst) in \
                     enumerate(train_loader):
                 try:
@@ -81,7 +77,6 @@ def train_prism_fine_tune_multi_sets(parameters, log):
                     y_hat2 = y_hat[:, 1]
                     loss1 = parameters.loss(y_hat1, target)
                     loss2 = parameters.loss2(y_hat2, target2)
-                    # loss = calc_loss(parameters.alpha, parameters.bins, loss1, loss2)
                     loss = calc_loss(1.0, parameters.bins, loss1, loss2)
                     loss.backward(retain_graph=True)
                     parameters.optimizer.step()
@@ -137,7 +132,6 @@ def train_prism_fine_tune_multi_sets(parameters, log):
                     y_hat2 = y_hat[:, 1]
                     loss1 = parameters.loss(y_hat1, target)
                     loss2 = parameters.loss2(y_hat2, target2)
-                    # loss = calc_loss(parameters.alpha, parameters.bins, loss1, loss2)
                     loss = calc_loss(1.0, parameters.bins, loss1, loss2)
                     true_values = np.append(true_values, target.cpu().numpy())
                     orig_true_values = np.append(orig_true_values, score_orig.cpu().numpy())
@@ -235,7 +229,6 @@ def train_prism_scores_multi_sets(parameters, log):
         log('Train')
         # --- loaders loop ---
         for t, train_loader in tqdm(enumerate(parameters.train_loaders_list)):
-            # log(f'Loader:{t}')
             # --- batch loop ---
             for j, (
                     pid, pos, all_deltas, pos_arr, emb_sector, emb_diff, score, bin_id, score_orig, src,
@@ -259,15 +252,8 @@ def train_prism_scores_multi_sets(parameters, log):
                             continue
                     # ---
                     target2 = bin_id.to(DEVICE, dtype=torch.float)
-
                     parameters.optimizer.zero_grad()
-
-                    # if j == 0 and t == 0 and i % 10 == 0:  # j=batch, t=loader, i=epoch
-                    if False:  # j=batch, t=loader, i=epoch
-                        y_hat = parameters.model(pid, pos, all_deltas, pos_arr, emb_sector, emb_diff, debug_data)
-                    else:
-                        y_hat = parameters.model(pid, pos, all_deltas, pos_arr, emb_sector, emb_diff)
-
+                    y_hat = parameters.model(pid, pos, all_deltas, pos_arr, emb_sector, emb_diff)
                     y_hat = y_hat.squeeze(dim=-1)
                     y_hat1 = y_hat[:, 0]
                     y_hat2 = y_hat[:, 1]
@@ -338,10 +324,6 @@ def train_prism_scores_multi_sets(parameters, log):
         # Add to result lists
         result.train_loss_per_epoch.append(epoch_train_loss)
         result.validation_loss_per_epoch.append(epoch_validation_loss)
-
-        # --- for printing losses per batch in 1st epoch ---
-        # if i == 0:
-        #     result.train_loss_per_batch += [x.item() for x in train_losses]
 
         mae = np.round(mean_absolute_error(true_values, pred_values), 4)
         mape = np.round(smape(true_values, pred_values), 4)
@@ -436,7 +418,6 @@ def calc_prediction_accuracy(true_values, pred_values, t):
         if true >= t and pred < t:
             false_positive += 1
     assert true_positive + true_negative + false_positive + false_negative == len(true_values)
-    # acc = ((true_positive + true_negative) * 1.0) / len(true_values)
     res = PredictionAccuracy()
     res.tp = true_positive
     res.tn = true_negative

@@ -12,12 +12,11 @@ from sklearn import preprocessing
 from sklearn.metrics import mean_absolute_error
 
 from data_model import Variant
+from prism_finetune_train import run_random_mutations_fine_tuning, clean_up_large_files
+from prism_score_eval import run_eval_on_model, PlotCreator, pickle_test_result
 from prism_score_train import fill_train_parameters, run_train, create_acc_loss_plots, create_model, \
     create_loss_batch_plot
 from run_prism_data_creation import create_diff_emb_splits, log
-from prism_finetune_train import run_random_mutations_fine_tuning, clean_up_large_files
-from prism_score_eval import run_eval_on_model, PlotCreator, \
-    pickle_test_result
 from utils import CFG, DEVICE, PRISM_EVAL_SPLIT, PRISM_TRAIN_SPLIT, PRISM_VALID_SPLIT, setup_reports, \
     get_protein_files_dict, create_result_txt, AA_ALPHABETICAL
 

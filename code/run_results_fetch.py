@@ -17,15 +17,11 @@ def fetch_ft_results_from_folder(all_res_folder):
         with open(res_path) as file:
             # print(res_path)
             while line := file.readline():
-                if " mae:" in line.strip():
-                    mae = line.split(':')[1].strip()
-                if "mape:" in line.strip():
-                    mape = line.split(':')[1].strip()
                 if "nn_mae:" in line.strip():
                     nn_mae = line.split(':')[1].strip()
                 if "spearman:" in line.strip():
                     sp = line.split(':')[1].strip()
-        list_of_tuples.append((res_id, mae, mape, nn_mae, sp))
+        list_of_tuples.append((nn_mae, sp))
     for t in list_of_tuples:
         print(','.join(t))
         pass

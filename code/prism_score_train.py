@@ -3,9 +3,7 @@ TBD
 """
 import logging
 import os
-import pickle
 import random
-import time
 
 import torch
 from matplotlib import pyplot as plt
@@ -16,8 +14,7 @@ from data_model import ModelConfig
 from engine_struct_attn import PrismScoreEmbDiffSimpleModel, PrismScoreDeltasOnlyModel, PrismScoreDeltasEmbDiffModel, \
     PrismScoreDeltasEmbModel, PrismScoreNoDDGModel, PrismScoreNoDeltasModel, PrismScoreNoDDEModel
 from train import train_prism_scores_multi_sets
-from utils import setup_reports, DEVICE, DUMP_ROOT, TrainParameters, CFG, PRISM_TRAIN_SPLIT, PRISM_VALID_SPLIT, \
-    PRETRAIN_FOLDER, PRISM_FINE_TRAIN_SPLIT
+from utils import DEVICE, TrainParameters, CFG
 
 LOG_ENABLED = True
 log = print
