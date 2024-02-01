@@ -4,7 +4,9 @@ The code for quantitative prediction of single point mutations impact on experim
 
 ### Usage
 
-TBD
+First of all, data preprocessing is needed to run the model training.
+
+After creation of pickled data with embeddings per protein (might take hours) the model can be run for training and evaluation.
 
 ### Required libraries
 
