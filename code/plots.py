@@ -1,16 +1,18 @@
 """
 Module for plotting the data
 """
-from data_model import ModelConfig, Prediction, PositionPrediction
-from matplotlib import pyplot as plt
 import logging
 import os
+
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from matplotlib import pyplot as plt
 from scipy.stats import pearsonr, spearmanr
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, mean_absolute_percentage_error
-from utils import TestResult, get_protein_files_dict, CFG
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+from data_model import PositionPrediction
+from utils import TestResult, get_protein_files_dict
 
 LOG_ENABLED = True
 log = print
@@ -23,28 +25,6 @@ class PlotCreator(object):
     """
     Contains function to plot various aspects of data
     """
-
-    def create_eval_plots(self, report_path, test_res, hoie_result):
-        """
-        Creates all plot for evaluations
-        @param report_path:
-        @param test_res:
-        @param hoie_result:
-        @return:
-        """
-        plots_path = os.path.join(report_path, 'plots_eval')
-        if not os.path.exists(plots_path):
-            os.makedirs(plots_path)
-        protein_name = get_protein_files_dict()[int(CFG['general']['eval_protein_file_number'])]
-        self.create_correlation_plot(plots_path, test_res, title=protein_name)
-        self.create_deltas_versus_plot(plots_path, test_res)
-        # ------- less important plots --------------
-        self.create_deltas_plot(plots_path, test_res)
-        self.create_position_deltas_plot(plots_path, test_res)
-        self.create_all_deltas_plot(plots_path, test_res)
-        if hoie_result is not None and len(hoie_result) == len(test_res.pred_values):
-            self.create_hoie_vs_values_plot(hoie_result, plots_path, test_res)
-            self.create_hoie_vs_deltas_plot(hoie_result, plots_path, test_res)
 
     def create_train_plots(self, report_path, test_res):
         """
@@ -76,6 +56,59 @@ class PlotCreator(object):
         self.create_correlation_plot(plots_path, test_res)
         self.create_deltas_versus_plot(plots_path, test_res)
         self.create_all_deltas_plot(plots_path, test_res)
+
+    def create_all_deltas_plot(self, report_path, test_res):
+        """
+        Create plot of delta score vs delta rank
+        X: Delta (score) = true - pred
+        Y: Delta (rank) = true - pred
+        @param report_path: path to report folder - where to store the plot files
+        @param test_res: test result object
+        """
+        plt.clf()
+        pos_predictions = self._create_position_predictions(test_res)
+        self._fill_ranks(pos_predictions)
+        xs = [x.get_score_delta() for x in pos_predictions]
+        ys = [x.get_rank_delta() for x in pos_predictions]
+        assert len(xs) == len(ys)
+
+        df = pd.DataFrame(columns=['xs', 'ys'])
+        df['xs'] = xs
+        df['ys'] = ys
+        sns.scatterplot(data=df, x="xs", y="ys", marker=".")
+        plt.xlabel("Delta (score) = true - pred")
+        plt.ylabel("Delta (rank) = true - pred")
+        plt.grid()
+        plot_path = os.path.join(report_path, f'{test_res.model_name}.pos.versus.mae.plot.png')
+        plt.savefig(plot_path)
+        # plt.show()
+        log(f'Created plt: {plot_path}')
+
+    def create_position_deltas_plot(self, report_path, test_res):
+        """
+        Create plot:
+        X: Position
+        Y: Delta (rank) = true - pred
+        @param report_path: path to report folder - where to store the plot files
+        @param test_res: test result object
+        """
+        plt.clf()
+        pos_predictions = self._create_position_predictions(test_res)
+        self._fill_ranks(pos_predictions)
+
+        pos_predictions.sort(key=lambda x: x.index)
+        xs = [x.index for x in pos_predictions]
+        ys = [x.get_rank_delta() for x in pos_predictions]
+
+        assert len(xs) == len(ys)
+        plt.plot(xs, ys, '.', color='black')
+        plt.xlabel("Position")
+        plt.ylabel("Delta (rank) = true - pred")
+        plt.grid()
+        plot_path = os.path.join(report_path, f'{test_res.model_name}.delta.position.plot.png')
+        plt.savefig(plot_path)
+        # plt.show()
+        log(f'Created plt: {plot_path}')
 
     @staticmethod
     def create_fine_tune_variants_plot(report_path, file_name, title, mutations_counts, mutations_results):
@@ -315,59 +348,6 @@ class PlotCreator(object):
         # plt.show()
         log(f'Created plt: {plot_path}')
 
-    def create_all_deltas_plot(self, report_path, test_res):
-        """
-        Create plot of delta score vs delta rank
-        X: Delta (score) = true - pred
-        Y: Delta (rank) = true - pred
-        @param report_path: path to report folder - where to store the plot files
-        @param test_res: test result object
-        """
-        plt.clf()
-        pos_predictions = self._create_position_predictions(test_res)
-        self._fill_ranks(pos_predictions)
-        xs = [x.get_score_delta() for x in pos_predictions]
-        ys = [x.get_rank_delta() for x in pos_predictions]
-        assert len(xs) == len(ys)
-
-        df = pd.DataFrame(columns=['xs', 'ys'])
-        df['xs'] = xs
-        df['ys'] = ys
-        sns.scatterplot(data=df, x="xs", y="ys", marker=".")
-        plt.xlabel("Delta (score) = true - pred")
-        plt.ylabel("Delta (rank) = true - pred")
-        plt.grid()
-        plot_path = os.path.join(report_path, f'{test_res.model_name}.pos.versus.mae.plot.png')
-        plt.savefig(plot_path)
-        # plt.show()
-        log(f'Created plt: {plot_path}')
-
-    def create_position_deltas_plot(self, report_path, test_res):
-        """
-        Create plot:
-        X: Position
-        Y: Delta (rank) = true - pred
-        @param report_path: path to report folder - where to store the plot files
-        @param test_res: test result object
-        """
-        plt.clf()
-        pos_predictions = self._create_position_predictions(test_res)
-        self._fill_ranks(pos_predictions)
-
-        pos_predictions.sort(key=lambda x: x.index)
-        xs = [x.index for x in pos_predictions]
-        ys = [x.get_rank_delta() for x in pos_predictions]
-
-        assert len(xs) == len(ys)
-        plt.plot(xs, ys, '.', color='black')
-        plt.xlabel("Position")
-        plt.ylabel("Delta (rank) = true - pred")
-        plt.grid()
-        plot_path = os.path.join(report_path, f'{test_res.model_name}.delta.position.plot.png')
-        plt.savefig(plot_path)
-        # plt.show()
-        log(f'Created plt: {plot_path}')
-
     @staticmethod
     def _fill_ranks(pos_predictions):
         pos_predictions.sort(key=lambda x: x.pred_score)
@@ -420,15 +400,4 @@ class PlotCreator(object):
 
 
 if __name__ == '__main__':
-    from utils import TrainResult, TestResult
-    import random
-
-    plotter = PlotCreator()
-    counts = ['4', '8', '12', '16', '20']
-    results = []
-    for _ in counts:
-        tmp = TrainResult()
-        tmp.test_result = TestResult()
-        tmp.test_result.mae = random.uniform(1, 10)
-        results.append(tmp)
-    plotter.create_fine_tune_variants_plot(r'.', 'rand_variants', 'KUKU-1', counts, results)
+    pass

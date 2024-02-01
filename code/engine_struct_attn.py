@@ -1,17 +1,12 @@
-import torch
-import numpy
-import math
-from torch import nn
-from torch.nn import functional as F
-from torch import Tensor, AnyType
+import copy
+import os
 from typing import Optional
 
-from classifier import Predictor, PredictorLarge, ResidualPredictor
-from utils import DEVICE
+import torch
 from matplotlib import pyplot as plt
-import time
-import os
-import copy
+from torch import Tensor, AnyType
+from torch import nn
+from torch.nn import functional as F
 
 
 def _get_clones(module, N):

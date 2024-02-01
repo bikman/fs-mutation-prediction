@@ -3,10 +3,9 @@ Module used to fetch data from result folders
 This data is put to CSV to be moved to Excel and plots
 """
 import os
-from results import BINS_RESULTS, NO_BINS_RESULTS
-from utils import RESULTS_PATH
-from result_lists import *
 import re
+
+from utils import RESULTS_PATH
 
 
 def fetch_ft_results_from_folder(all_res_folder):
