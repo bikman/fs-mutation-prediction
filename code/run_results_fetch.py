@@ -47,23 +47,6 @@ def fetch_results_from_folder(all_res_folder):
             print(res_path)
             ft_dict = {}
             while line := file.readline().strip():
-                # if line.startswith("mae:"):
-                #     mae = line.split(':')[1].strip()
-                #     continue
-                # if line.startswith("nn_mae:"):
-                #     nn_mae = line.split(':')[1].strip().strip(']').strip('[').split(',')
-                #     continue
-                # if line.startswith("spearman:"):
-                #     sp = line.split(':')[1].strip()
-                #     continue
-                # if line.startswith("ft") and " mae" in line:
-                #     mut_count = re.search(r'^ft[\d]+', line).group(0)[2:]
-                #     value = line.split(':')[1]
-                #     if mut_count in ft_dict:
-                #         ft_dict[mut_count].append(value)
-                #     else:
-                #         ft_dict[mut_count] = [value]
-                #     continue
                 if line.startswith("ft") and "nn_mae" in line:
                     mut_count = re.search(r'^ft[\d]+', line).group(0)[2:]
                     value = line.split(':')[1]
@@ -72,16 +55,6 @@ def fetch_results_from_folder(all_res_folder):
                     else:
                         ft_dict[mut_count] = [value]
                     continue
-                # if line.startswith("ft") and "sp." in line:
-                #     mut_count = re.search(r'^ft[\d]+', line).group(0)[2:]
-                #     value = line.split(':')[1]
-                #     if mut_count in ft_dict:
-                #         ft_dict[mut_count].append(value)
-                #     else:
-                #         ft_dict[mut_count] = [value]
-                #     continue
-
-        # csv_row = [res_id, mae] + nn_mae + [sp]
         csv_row = [res_id]
         # all
         for mut_count in ft_dict:
@@ -89,45 +62,6 @@ def fetch_results_from_folder(all_res_folder):
         list_of_tuples.append(csv_row)
     for t in list_of_tuples:
         print(','.join(t))  # all
-        pass
-    print('ok')
-
-
-def fetch_result_from_list_of_folders(runs_list):
-    '''
-    TBD
-    @param runs_list:
-    @return:
-    '''
-    list_of_tuples = []
-    for res_id in runs_list:
-        run_folder_path = os.path.join(RESULTS_PATH, res_id)
-        log_file = [f for f in os.listdir(run_folder_path) if f.endswith('.log')][0]
-        log_file_path = os.path.join(run_folder_path, log_file)
-        with open(log_file_path) as file:
-            print(res_id, log_file_path)
-            is_in_mut_count = False
-            is_in_result = False
-            while line := file.readline():
-                # if line.startswith("mut_count='16'"):
-                if line.startswith("mut_count='4'"):
-                    is_in_mut_count = True
-                    continue
-                if line.startswith("is_destructive='0'") and is_in_mut_count:
-                    is_in_result = True
-                    continue
-                if is_in_result and line.startswith("MAE"):
-                    mae = line.split(':')[1].strip()
-                    continue
-                if is_in_result and line.startswith("Spearman"):
-                    sp = line.split(':')[1].strip()
-                    continue
-                if is_in_result and line.startswith("R2"):
-                    is_in_mut_count = False
-                    is_in_result = False
-        list_of_tuples.append((res_id, mae, sp))
-    for t in list_of_tuples:
-        print(f'{t[0]},{t[1]},{t[2]}')  # res_id, mae, sp
         pass
     print('ok')
 

@@ -34,7 +34,7 @@ if USE_SEED:
     torch.manual_seed(SEED)
 
 
-def create_model_config():
+def _create_model_config():
     """
     Creates Model Configuration object
     @return: cfg:ModelConfig
@@ -49,7 +49,7 @@ def create_model_config():
     return cfg
 
 
-def choose_optimizer(model, pretrained_enabled):
+def _choose_optimizer(model, pretrained_enabled):
     """
     Choose optimizer according to configuration value
     @param pretrained_enabled: should we use LR for pretrained flow
@@ -59,7 +59,6 @@ def choose_optimizer(model, pretrained_enabled):
     lr = float(CFG['flow_train']['lr'])
     if pretrained_enabled != 0:
         lr = float(CFG['flow_pretrained']['lr'])
-    # log(f'LR:{lr}')
     res = torch.optim.Adam(model.parameters(), lr=lr)  # ADAM
     return res
 
@@ -94,60 +93,6 @@ def run_train(train_dss, valid_dss, train_params):
     return train_res
 
 
-def load_prism_score_datasets():
-    """
-    Load datasets from PICKLE files
-    @return: lists of train and validation datasets
-    """
-    log(f'{DUMP_ROOT=}')
-    dump_path = os.path.join(DUMP_ROOT, PRISM_TRAIN_SPLIT)
-    with open(dump_path, "rb") as f:
-        train_split = pickle.load(f)
-    log(f'loaded: {dump_path}\n')
-    dump_path = os.path.join(DUMP_ROOT, PRISM_VALID_SPLIT)
-    with open(dump_path, "rb") as f:
-        valid_split = pickle.load(f)
-    log(f'loaded: {dump_path}\n')
-    use_fine_tune = int(CFG['flow_train']['use_fine_tune_data'])
-    log(f'{use_fine_tune=}')
-    if use_fine_tune == 1:
-        dump_path = os.path.join(DUMP_ROOT, PRISM_FINE_TRAIN_SPLIT)
-        with open(dump_path, "rb") as f:
-            train_fine_split = pickle.load(f)
-        log(f'loaded: {dump_path}\n')
-        train_split += train_fine_split
-    return train_split, valid_split
-
-
-def create_model_pretrained():
-    model = int(CFG['general']['model'])
-    log(f'model={model}')
-    cfg = create_model_config()
-    log(cfg)
-    log('Loading pretrain model')
-    log(f'{PRETRAIN_FOLDER=}')
-    if model == 1:
-        model_obj = PrismScoreEmbDiffSimpleModel(cfg).to(DEVICE)
-    elif model == 2:
-        model_obj = PrismScoreDeltasOnlyModel(cfg).to(DEVICE)
-    elif model == 3:
-        model_obj = PrismScoreDeltasEmbDiffModel(cfg).to(DEVICE)
-    elif model == 4:
-        model_obj = PrismScoreDeltasEmbModel(cfg).to(DEVICE)
-    elif model == 5:
-        model_obj = PrismScoreNoDDGModel(cfg).to(DEVICE)
-    elif model == 6:
-        model_obj = PrismScoreNoDDEModel(cfg).to(DEVICE)
-    elif model == 7:
-        model_obj = PrismScoreNoDeltasModel(cfg).to(DEVICE)
-    else:
-        raise Exception(f'Not supported model {model}')
-    model_file = os.path.join(PRETRAIN_FOLDER, model_obj.file_name)
-    model_obj.load_state_dict(torch.load(model_file))
-    log(model_obj)
-    return model_obj
-
-
 def create_model():
     """
     Create model object according to config
@@ -155,7 +100,7 @@ def create_model():
     """
     model = int(CFG['general']['model'])
     log(f'model={model}')
-    cfg = create_model_config()
+    cfg = _create_model_config()
     log(cfg)
     # create new model
     log('Creating new model')
@@ -264,34 +209,6 @@ def create_acc_loss_plots(report_path, train_res):
     print(f'Created {plot_path}')
 
 
-def run_multiset_scores_training(report_path):
-    """
-    Prepares the model and runs the training
-    @param report_path: folder to save report
-    """
-    log(os.path.basename(__file__))
-    pretrained_enabled = int(CFG['flow_pretrained']['is_enabled'])
-    log(f'{pretrained_enabled=}')
-
-    if pretrained_enabled == 0:
-        model = create_model()
-    else:
-        model = create_model_pretrained()
-
-    # define parameters
-    train_params = fill_train_parameters(model, pretrained_enabled, report_path)
-    # --- Load datasets ---
-    train_dss, valid_dss = load_prism_score_datasets()
-
-    # --- Run training ---
-    train_res = run_train(train_dss, valid_dss, train_params)
-
-    # --- Create plot of loss and acc ---
-    create_acc_loss_plots(report_path, train_res)
-
-    return model
-
-
 def fill_train_parameters(model, pretrained_enabled, report_path):
     """
     Create train parameters
@@ -304,8 +221,8 @@ def fill_train_parameters(model, pretrained_enabled, report_path):
     train_params.model = model
     train_params.loss = torch.nn.MSELoss()
     train_params.loss2 = torch.nn.MSELoss()
-    train_params.optimizer = choose_optimizer(model, pretrained_enabled)
-    create_train_scheduler(train_params)
+    train_params.optimizer = _choose_optimizer(model, pretrained_enabled)
+    _create_train_scheduler(train_params)
     train_params.model_path = os.path.join(report_path, model.file_name)
     train_params.report_path = report_path
     train_params.epochs = int(CFG['flow_train']['epochs'])
@@ -316,7 +233,7 @@ def fill_train_parameters(model, pretrained_enabled, report_path):
     return train_params
 
 
-def create_train_scheduler(train_params):
+def _create_train_scheduler(train_params):
     """
     Creates scheduler for training (if specified)
     @param train_params: training parameters
@@ -326,30 +243,9 @@ def create_train_scheduler(train_params):
         log(f'{gamma=}')
         step_size = int(CFG['general']['step'])
         log(f'{step_size=}')
-        # ---- Warm up scheduler ----
-        # epochs = int(CFG['flow_train']['epochs'])
-        # log(f'{epochs=}')
-        # scheduler_next = StepLR(train_params.optimizer, step_size=step_size, gamma=gamma)
-        # warmup_epochs = int(epochs / 10)
-        # log(f'{warmup_epochs=}')
-        # train_params.scheduler = GradualWarmupScheduler(train_params.optimizer, 1, warmup_epochs,
-        #                                                 after_scheduler=scheduler_next)
         # ---- Regular Lr scheduler ----
         train_params.scheduler = StepLR(train_params.optimizer, step_size=step_size, gamma=gamma)
 
 
-def main():
-    start_time = time.time()
-    report_path = setup_reports('score_training')
-    log(f'Report path:{report_path}')
-    log(DEVICE)
-
-    run_multiset_scores_training(report_path)
-
-    elapsed_time = time.time() - start_time
-    log(f'time: {elapsed_time:5.2f} sec')
-    print('OK')
-
-
 if __name__ == '__main__':
-    main()
+    pass
