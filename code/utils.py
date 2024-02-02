@@ -122,9 +122,11 @@ AA_ALLOWED_MUTATIONS_DICT = {
     'L': 'VSWPRIMFHQ'
 }
 
+"""
+Main dictionary to set index for protein file
+"""
 ALL_PROTEIN_FILES_DICT = {
     1: '002_PTEN_phosphatase_activity.txt',
-    # -----------------------------------------------------
     2: '003_PTEN_abundance.txt',
     3: '004_NUDT15_drug_sensitivity_reordered.txt',
     4: '005_NUDT15_abundance_reordered.txt',
@@ -162,7 +164,6 @@ ALL_PROTEIN_FILES_DICT = {
     36: '999_HAh3n2_DMS.txt',
     37: '999_HRas_DMS.txt',
     38: '999_HSP82_DMS.txt',
-    # -----------------------------------------------------
     39: '999_IF-1_DMS.txt'
 }
 
@@ -220,8 +221,7 @@ MULTITEST_PROTEINS = [
 
 def get_protein_files_dict():
     """
-
-    @return:
+    Returns dictionary of protein files according to CFG setup
     """
     # get the dictionary according to CFG selection
     protein_set_index = int(CFG['general']['protein_set'])
