@@ -6,6 +6,12 @@ The code for quantitative prediction of single point mutations impact on experim
 
 First of all, data preprocessing is needed to run the model training.
 
+Run data creation script with argument specifying where to put the resulted dumps. Each dump file contains all the protein mutations, scores and embeddings.
+
+```
+run_prism_data_creation.py -dump_root [path_to_folder]
+```
+
 After creation of pickled data with embeddings per protein (might take hours) the model can be run for training and evaluation.
 
 ### Required libraries
