@@ -12,8 +12,9 @@ from sklearn import preprocessing
 from sklearn.metrics import mean_absolute_error
 
 from data_model import Variant
+from plots import PlotCreator
 from prism_finetune_train import run_random_mutations_fine_tuning, clean_up_large_files
-from prism_score_eval import run_eval_on_model, PlotCreator, pickle_test_result
+from prism_score_eval import run_eval_on_model, pickle_test_result
 from prism_score_train import fill_train_parameters, run_train, create_acc_loss_plots, create_model, \
     create_loss_batch_plot
 from run_prism_data_creation import create_diff_emb_splits, log
@@ -92,7 +93,6 @@ def main():
     log(f"{CFG['flow_data_creation']['variants_cutoff']=}")
     log(f"{CFG['general']['gamma']=}")
     log(f"{CFG['general']['step']=}")
-    log(f"{CFG['general']['use_pdb']=}")
     log(f"{CFG['general']['use_deltas_encoder']=}")
     log(f"{CFG['flow_train']['patience']=}")
     log(f"{CFG['general']['bins']=}")
@@ -259,7 +259,6 @@ if __name__ == '__main__':
     parser.add_argument('-sched', type=int, help='Use scheduler (1 or 0)', required=False)
     parser.add_argument('-gamma', type=float, help='Gamma param for LR scheduler', required=False)
     parser.add_argument('-step', type=int, help='Step param for LR scheduler', required=False)
-    parser.add_argument('-use_pdb', type=int, help='Use PDB indexed diffs (1 or 0)', required=False)
     parser.add_argument('-deltas_enc', type=int, help='Use encoder for deltas (1 or 0)', required=False)
     parser.add_argument('-patience', type=int, help='When to stop the training', required=False)
     parser.add_argument('-bins', type=int, help='Number of bins to split the data', required=False)
@@ -292,8 +291,6 @@ if __name__ == '__main__':
         CFG['general']['gamma'] = str(args.gamma)
     if args.step is not None:
         CFG['general']['step'] = str(args.step)
-    if args.use_pdb is not None:
-        CFG['general']['use_pdb'] = str(args.use_pdb)
     if args.use_pdb is not None:
         CFG['general']['use_deltas_encoder'] = str(args.deltas_enc)
     if args.patience is not None:

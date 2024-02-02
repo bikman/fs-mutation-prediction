@@ -20,7 +20,7 @@ CONFIG_FILE = 'config.win.ini'
 ESM_MODEL = r'C:\MODELS\esm1b_msa\esm_msa1b_t12_100M_UR50S.pt'
 ESM_REGRESSION = r'C:\MODELS\esm1b_msa\esm_msa1b_t12_100M_UR50S-contact-regression.pt'
 MODELS_FOLDER = r'models'
-LOG_FOLDER = r'D:\GIT\MscThesis\code\logs'
+LOG_FOLDER = r'logs'
 RESULTS_PATH = r'D:\RUN_RESULTS'  # windows only
 if platform == "linux" or platform == "linux2":
     REPORT_ROOT = '/root/code/reports'
@@ -44,9 +44,6 @@ def load_config():
 CFG = load_config()  # global config object
 print(CFG)
 DUMP_ROOT = str(CFG['general']['dump_root'])  # the folder where all the data will be created
-PRETRAIN_FOLDER = str(CFG['flow_pretrained']['pretrain_folder'])
-FINE_TUNE_FOLDER = str(CFG['flow_fine_tune']['fine_tune_folder'])
-
 PRISM_TRAIN_SPLIT = 'prism_train_split.pkl'
 PRISM_VALID_SPLIT = 'prism_valid_split.pkl'
 PRISM_EVAL_SPLIT = 'prism_eval_split.pkl'
@@ -54,10 +51,9 @@ PRISM_FINE_TRAIN_SPLIT = 'prism_fine_train_split.pkl'
 PRISM_FINE_EVAL_SPLIT = 'prism_fine_eval_split.pkl'
 
 PRISM_FOLDER = r'C:\DATASETS\ECOD_MAVE\mave'
-ECOD_FOLDER = r'C:\DATASETS\ECOD_MAVE\pdbs'  # folder from Rachel - good PDBs
 if platform == "linux" or platform == "linux2":
     PRISM_FOLDER = r'/root/code/data/mave'
-    ECOD_FOLDER = r'/root/code/data/pdbs'
+
 
 # device definition
 DEVICE = torch.device('cpu')

@@ -237,26 +237,17 @@ def _load_diff_embeddings(step=0):
     """
     emb_dim = EsmEmbeddingFactory.get_emb_dim()
     log('Load PRISM datas')
-    use_pdb = int(CFG['general']['use_pdb'])
-    log(f'Use PDB: {use_pdb}')
     prism_datas = []
     protein_dict = get_protein_files_dict()
     log(f'Protein dict length:{len(protein_dict)}')
     log(f'Protein indices: {protein_dict.keys()}')
     log(f'{DUMP_ROOT=}')
     for f in Path(PRISM_FOLDER).rglob('*.txt'):
-
         file_name = os.path.basename(f)
         if file_name not in protein_dict.values():
             continue
-
         log(f'Parsing: {file_name}')
-        if use_pdb == 0:
-            dump_path = os.path.join(DUMP_ROOT, f'{file_name}.data.step_{step}.pkl')
-        elif use_pdb == 1:
-            dump_path = os.path.join(DUMP_ROOT, f'{file_name}.data.pdb.step_{step}.pkl')
-        else:
-            raise Exception(f'Illegal use_pdb={use_pdb}')
+        dump_path = os.path.join(DUMP_ROOT, f'{file_name}.data.step_{step}.pkl')
         if not os.path.isfile(dump_path):
             log(f'Cannot found: {f}')
             continue

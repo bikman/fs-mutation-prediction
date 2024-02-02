@@ -10,10 +10,10 @@ import numpy
 import torch
 
 from data_model import ModelConfig, Variant
+from plots import PlotCreator
 from prism_finetune_data_creation import create_fine_tune_diff_splits
 from prism_finetune_train import fill_fine_tune_train_params, run_train_fine_tune, calc_train_ft_average_result, \
     calculate_ft_nn_mae
-from prism_score_eval import PlotCreator
 from prism_score_train import create_model
 from run_prism_data_creation import create_seq_embedding_dict, create_seq_embedder, _load_diff_embeddings, \
     calculate_bins
