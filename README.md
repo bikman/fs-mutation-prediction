@@ -15,10 +15,9 @@ It is used to extract embeddings from an protein sequences. Enables SOTA inferen
 (ICML'21 version, June 2021).
 
 
-(More info here: https://github.com/facebookresearch/esm)
+More info [here](https://github.com/facebookresearch/esm)
 
-Pretrained LLM for embedder is here:
-https://dl.fbaipublicfiles.com/fair-esm/models/esm_msa1b_t12_100M_UR50S.pt
+Pretrained LLM file (1.3Gb) for embedder is [here](https://dl.fbaipublicfiles.com/fair-esm/models/esm_msa1b_t12_100M_UR50S.pt)
 
 
 
