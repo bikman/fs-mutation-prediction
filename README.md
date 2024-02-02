@@ -21,5 +21,9 @@ Pretrained LLM file (1.3Gb) for embedder is [here](https://dl.fbaipublicfiles.co
 
 ### Data
 
-MAVE data files are included in the 'mave' folder
+MAVE data files are included in the 'mave' folder.
+
+### Source code
+
+The complete project is in Python plus PyTorch and it is in 'code' folder.
 
