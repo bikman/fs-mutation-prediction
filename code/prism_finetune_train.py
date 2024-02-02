@@ -59,7 +59,7 @@ def fill_fine_tune_train_params(model, report_path):
     lr = float(CFG['flow_fine_tune']['lr'])
     log(f'FT {lr=}')
     train_params.optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-    gamma = float(CFG['general']['gamma'])
+    gamma = 0.5
     log(f'{gamma=}')
     step_size = int(CFG['general']['step'])
     log(f'{step_size=}')
@@ -106,7 +106,6 @@ def run_random_mutations_fine_tuning(
         log(f'Running file tune mutations count: {mut_count}')
         log(f'is_destructive={is_destructive}')
         log('=' * 100)
-        CFG['fine_tuning_data_creation']['eval_data_type'] = '1'
         CFG['fine_tuning_data_creation']['data_count'] = mut_count
         CFG['fine_tuning_data_creation']['destructive_data_only'] = is_destructive
 

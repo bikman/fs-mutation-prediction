@@ -88,8 +88,6 @@ def main():
     log(f"{CFG['general']['attn_len']=}")
     log(f"{CFG['flow_train']['lr']=}")
     log(f"{CFG['flow_train']['epochs']=}")
-    log(f"{CFG['flow_data_creation']['variants_cutoff']=}")
-    log(f"{CFG['general']['gamma']=}")
     log(f"{CFG['general']['step']=}")
     log(f"{CFG['flow_train']['patience']=}")
     log(f"{CFG['flow_train']['alpha']=}")
@@ -249,9 +247,7 @@ if __name__ == '__main__':
     parser.add_argument('-model', type=int, help='Model to use for train/eval', required=False)
     parser.add_argument('-lr', type=float, help='Learning rate', required=False)
     parser.add_argument('-epochs', type=int, help='Number of epochs', required=False)
-    parser.add_argument('-v_cutoff', type=int, help='Percentage of variants to be taken from data', required=False)
     parser.add_argument('-attn', type=int, help='Length of attention neighbors', required=False)
-    parser.add_argument('-gamma', type=float, help='Gamma param for LR scheduler', required=False)
     parser.add_argument('-step', type=int, help='Step param for LR scheduler', required=False)
     parser.add_argument('-patience', type=int, help='When to stop the training', required=False)
     parser.add_argument('-alpha', type=float, help='Parameter coefficient for loss', required=False)
@@ -273,10 +269,6 @@ if __name__ == '__main__':
         CFG['flow_train']['lr'] = str(args.lr)
     if args.epochs is not None:
         CFG['flow_train']['epochs'] = str(args.epochs)
-    if args.v_cutoff is not None:
-        CFG['flow_data_creation']['variants_cutoff'] = str(args.v_cutoff)
-    if args.gamma is not None:
-        CFG['general']['gamma'] = str(args.gamma)
     if args.step is not None:
         CFG['general']['step'] = str(args.step)
     if args.patience is not None:

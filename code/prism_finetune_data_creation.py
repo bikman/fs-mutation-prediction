@@ -20,7 +20,7 @@ if LOG_ENABLED:
     log = logging.info
 
 USE_SEED = True
-SEED = CFG['general']['seed']
+SEED = 1234
 
 if USE_SEED:
     print(f'SEED:{SEED}')
@@ -81,8 +81,6 @@ def create_fine_tune_diff_splits(pname_to_seq_embedding, min_max_eval_vs=None):
         # normalize_deltas_only(prism_data_list)
         # log(f'done!')
 
-    eval_data_type = int(CFG['fine_tuning_data_creation']['eval_data_type'])
-    log(f'{eval_data_type=}')
     data_count = int(CFG['fine_tuning_data_creation']['data_count'])
     log(f'{data_count=}')
     destructive_data_only = int(CFG['fine_tuning_data_creation']['destructive_data_only'])
@@ -94,7 +92,7 @@ def create_fine_tune_diff_splits(pname_to_seq_embedding, min_max_eval_vs=None):
     log(f'{fine_tune_name=}')
     log(f'{fine_tune_protein_filename=}')
     set_creator = PrismDiffEmbFineTuneDatasetCreator()
-    set_creator.eval_data_type = eval_data_type
+    set_creator.eval_data_type = 1  # per mutation
     set_creator.data_count = data_count
     set_creator.destructive_data_only = destructive_data_only
     set_creator.prism_data_list = prism_data_list

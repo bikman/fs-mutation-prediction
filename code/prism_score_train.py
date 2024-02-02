@@ -23,7 +23,7 @@ if LOG_ENABLED:
     log = logging.info
 
 USE_SEED = True
-SEED = CFG['general']['seed']
+SEED = 1234
 
 if USE_SEED:
     print(f'SEED:{SEED}')
@@ -231,7 +231,7 @@ def _create_train_scheduler(train_params):
     Creates scheduler for training (if specified)
     @param train_params: training parameters
     """
-    gamma = float(CFG['general']['gamma'])
+    gamma = 0.5
     log(f'{gamma=}')
     step_size = int(CFG['general']['step'])
     log(f'{step_size=}')

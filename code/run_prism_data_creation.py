@@ -29,7 +29,7 @@ if LOG_ENABLED:
     log = logging.info
 
 USE_SEED = True
-SEED = CFG['general']['seed']
+SEED = 1234
 
 if USE_SEED:
     print(f'SEED:{SEED}')
@@ -368,22 +368,6 @@ def create_diff_emb_splits():
     log('Create datasets')
     set_creator = PrismDiffEmbMultisetCreator(prism_data_list, pname_to_seq_embedding)
     dss = set_creator.create_datasets()
-
-    log('Cutoff mutation variants')
-    cutoff_percent = int(CFG['flow_data_creation']['variants_cutoff'])
-    if cutoff_percent >= 100 or cutoff_percent <= 0:
-        log('Skipped!')
-    else:
-        log(f'{cutoff_percent=}')
-        for ds in dss:
-            if ds.file_name == get_protein_files_dict()[int(CFG['general']['eval_protein_file_number'])]:
-                log(f'Skipped eval DS {ds}')
-                continue
-            total = len(ds.data)
-            cutoff = int(total * (cutoff_percent / 100.0))
-            cut_variants = random.sample(ds.data, cutoff)
-            ds.data = cut_variants
-            log(f'{total} -> after cut: {len(ds)}')
 
     # --- filter out datasets for MULTI-TEST proteins ---
     log('Filtering out multi-test proteins')
