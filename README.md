@@ -10,7 +10,9 @@ After creation of pickled data with embeddings per protein (might take hours) th
 
 ### Required libraries
 
-Our model data is created with ESM-1b embedder.
+Our model data is created with ESM-1b embedder. 
+It is used to extract embeddings from an protein sequences. Enables SOTA inference of structure. Released with Rao et al. 2021 (ICML'21 version, June 2021).
+https://www.biorxiv.org/content/10.1101/2021.02.12.430858v2
 
 (More info here: https://github.com/facebookresearch/esm)
 
