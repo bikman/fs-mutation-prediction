@@ -214,7 +214,7 @@ def main():
     mutations_counts = create_fine_tuning_mutation_counts(total_eval_mut_count)
     log(f'Fine tuning mutation counts: {mutations_counts}')
     ft_nd_results = run_random_mutations_fine_tuning(
-        mutations_counts, pname_to_seq_embedding, report_path, min_max_eval_v, is_destructive='0', loops=loops)
+        mutations_counts, pname_to_seq_embedding, report_path, min_max_eval_v, loops=loops)
     title = f'{protein_filename}: fine tuning - random variants'
     plotter.create_fine_tune_variants_plot(report_path, 'random_variants', title, mutations_counts, ft_nd_results)
 

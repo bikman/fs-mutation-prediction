@@ -90,7 +90,6 @@ def main():
 
     mut_count = int(CFG['fine_tuning_data_creation']['data_count'])
     log(f'{mut_count=}')
-    CFG['fine_tuning_data_creation']['destructive_data_only'] = '0'
 
     plots_path = os.path.join(report_path, 'plots_ft')
     if not os.path.exists(plots_path):

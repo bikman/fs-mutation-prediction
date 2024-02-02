@@ -83,8 +83,6 @@ def create_fine_tune_diff_splits(pname_to_seq_embedding, min_max_eval_vs=None):
 
     data_count = int(CFG['fine_tuning_data_creation']['data_count'])
     log(f'{data_count=}')
-    destructive_data_only = int(CFG['fine_tuning_data_creation']['destructive_data_only'])
-    log(f'{destructive_data_only=}')
 
     allowed_proteins = [d.protein_name for d in prism_data_list]
     assert len(allowed_proteins) == 1
@@ -94,7 +92,7 @@ def create_fine_tune_diff_splits(pname_to_seq_embedding, min_max_eval_vs=None):
     set_creator = PrismDiffEmbFineTuneDatasetCreator()
     set_creator.eval_data_type = 1  # per mutation
     set_creator.data_count = data_count
-    set_creator.destructive_data_only = destructive_data_only
+    set_creator.destructive_data_only = 0
     set_creator.prism_data_list = prism_data_list
     set_creator.name_to_seq_emb = pname_to_seq_embedding
     if min_max_eval_vs is not None:

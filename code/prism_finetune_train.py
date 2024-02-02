@@ -91,26 +91,24 @@ def calculate_ft_nn_mae(train_ft_res, eval_ft_quantile_transformer):
 
 
 def run_random_mutations_fine_tuning(
-        random_mutations_counts, pname_to_seq_embedding, report_path, min_max_eval_vs, is_destructive, loops):
+        random_mutations_counts, pname_to_seq_embedding, report_path, min_max_eval_vs, loops):
     """
     Fine-tuning on a randomly selected number of mutations
     @param pname_to_seq_embedding:
     @param loops: number of averaging loops
     @param random_mutations_counts: how many variants to check
     @param report_path: where to store results
-    @param is_destructive: choose between destructive and non-destructive variants
     """
+    is_destructive = 0
     random_mutations_results = []
     for mut_count in random_mutations_counts:
         log('=' * 100)
         log(f'Running file tune mutations count: {mut_count}')
-        log(f'is_destructive={is_destructive}')
         log('=' * 100)
         CFG['fine_tuning_data_creation']['data_count'] = mut_count
-        CFG['fine_tuning_data_creation']['destructive_data_only'] = is_destructive
 
         # --- print correlation plot only for non-destructive mutations ---
-        should_create_ft_plot = int(is_destructive) == 0
+        should_create_ft_plot = True
         plots_path = os.path.join(report_path, 'plots_ft')
         if not os.path.exists(plots_path):
             os.makedirs(plots_path)
@@ -156,7 +154,6 @@ def run_random_mutations_fine_tuning(
         random_mutations_results.append(tran_average_result)
         log(tran_average_result)
         log(f'{mut_count=}')
-        log(f'{is_destructive=}')
         log(tran_average_result.get_test_results())
         log('Finished fine tune flow...')
     return random_mutations_results
