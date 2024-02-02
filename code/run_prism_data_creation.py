@@ -20,7 +20,7 @@ from dataset import PrismDiffEmbMultisetCreator
 from embeddings import EsmEmbeddingFactory
 from utils import DEVICE, PRISM_FOLDER, CFG, DUMP_ROOT, MAX_SEQUENCE, get_protein_files_dict, \
     normalize_scores_only, MULTITEST_PROTEINS
-from utils import setup_reports, get_embedding_sector, ALL_PROTEIN_FILES_DICT, normalize_deltas_only
+from utils import setup_reports, get_embedding_sector, ALL_PROTEIN_FILES_DICT, normalize_deltas_only, DIFF_LEN
 
 LOG_ENABLED = True
 log = print
@@ -297,7 +297,7 @@ def create_prism_score_diff_data(max_v=-1):
     log(f"{CFG['flow_data_creation']['protein_id']=}")
     log('=' * 100)
 
-    diff_len = int(CFG['general']['diff_len'])
+    diff_len = DIFF_LEN
     log(f'{diff_len=}')
 
     _save_diff_embeddings(max_v=max_v, step=diff_len)
@@ -336,7 +336,7 @@ def create_diff_emb_splits():
     @return: 3 slits
     """
     log(f'create_diff_emb_splits')
-    diff_len = int(CFG['general']['diff_len'])
+    diff_len = DIFF_LEN
     log(f'{diff_len=}')
 
     prism_data_list = _load_diff_embeddings(step=diff_len)

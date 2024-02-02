@@ -11,7 +11,7 @@ import torch
 
 from dataset import PrismDiffEmbFineTuneDatasetCreator
 from run_prism_data_creation import parse_prism_score_file, calculate_bins
-from utils import PRISM_FOLDER, CFG, DUMP_ROOT, get_protein_files_dict, normalize_scores_ds
+from utils import PRISM_FOLDER, CFG, DUMP_ROOT, get_protein_files_dict, normalize_scores_ds, DIFF_LEN
 
 LOG_ENABLED = True
 log = print
@@ -30,7 +30,7 @@ if USE_SEED:
 
 def create_fine_tune_diff_splits(pname_to_seq_embedding, min_max_eval_vs=None):
     log(f'create_diff_emb_splits')
-    diff_len = int(CFG['general']['diff_len'])
+    diff_len = DIFF_LEN
     log(f'{diff_len=}')
 
     fine_tune_protein_number = int(CFG['general']['eval_protein_file_number'])

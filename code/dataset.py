@@ -9,7 +9,7 @@ from torch.utils.data import Dataset
 from tqdm import tqdm
 
 from embeddings import EsmEmbeddingFactory
-from utils import AA_ALPHABETICAL, AA_DICT, get_embedding_sector, CFG, get_protein_files_dict
+from utils import AA_ALPHABETICAL, AA_DICT, get_embedding_sector, CFG, get_protein_files_dict, DIFF_LEN
 
 LOG_ENABLED = True  # put True to enable logging
 
@@ -67,7 +67,7 @@ class PrismStackedDiffEmbDataset(Dataset):
     def create_data_item(v, prism_data, seq_emb, pid):
         # some constants to use further
         # ------------------------------------------------
-        step = int(CFG['general']['diff_len'])
+        step = DIFF_LEN
         width = 2 * step + 1
         num_of_aa = len(AA_ALPHABETICAL)
         cz = int(CFG['general']['cz'])

@@ -18,7 +18,7 @@ from prism_score_train import create_model
 from run_prism_data_creation import create_seq_embedding_dict, create_seq_embedder, _load_diff_embeddings, \
     calculate_bins
 from run_prism_data_creation import log
-from utils import CFG, DEVICE, setup_reports, get_protein_files_dict, MODELS_FOLDER, AA_ALPHABETICAL
+from utils import CFG, DEVICE, setup_reports, get_protein_files_dict, MODELS_FOLDER, AA_ALPHABETICAL, DIFF_LEN
 
 
 def create_result_txt(report_path, protein_filename, train_res):
@@ -62,7 +62,7 @@ def main():
     loops = int(CFG['flow_fine_tune']['loops'])
     log(f'{loops=}')
 
-    diff_len = int(CFG['general']['diff_len'])
+    diff_len = DIFF_LEN
     log(f'{diff_len=}')
     prism_data_list = _load_diff_embeddings(step=diff_len)
     calculate_bins(prism_data_list)
@@ -106,7 +106,7 @@ def main():
         cfg = ModelConfig()
         cfg.heads = int(CFG['flow_train']['heads'])
         cfg.seq_emb_size = int(CFG['general']['seq_emb_size'])
-        cfg.diff_width = int(CFG['general']['diff_len'])
+        cfg.diff_width = DIFF_LEN
         cfg.attn_len = int(CFG['general']['attn_len'])
         cfg.cz = int(CFG['general']['cz'])
 

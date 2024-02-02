@@ -14,7 +14,7 @@ from data_model import ModelConfig
 from engine_struct_attn import PrismScoreEmbDiffSimpleModel, PrismScoreDeltasOnlyModel, PrismScoreDeltasEmbDiffModel, \
     PrismScoreDeltasEmbModel, PrismScoreNoDDGModel, PrismScoreNoDeltasModel, PrismScoreNoDDEModel
 from train import train_prism_scores_multi_sets
-from utils import DEVICE, TrainParameters, CFG
+from utils import DEVICE, TrainParameters, CFG, DIFF_LEN
 
 LOG_ENABLED = True
 log = print
@@ -39,7 +39,7 @@ def _create_model_config():
     cfg = ModelConfig()
     cfg.heads = int(CFG['flow_train']['heads'])
     cfg.seq_emb_size = int(CFG['general']['seq_emb_size'])
-    cfg.diff_width = int(CFG['general']['diff_len'])
+    cfg.diff_width = DIFF_LEN
     cfg.attn_len = int(CFG['general']['attn_len'])
     cfg.cz = int(CFG['general']['cz'])
     return cfg
