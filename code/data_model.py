@@ -78,7 +78,6 @@ class ModelConfig(object):
         self.attn_len = 0  # number of layers in transformer encoders
         self.diff_width = 0  # with of embedding window diff (plus-minus from the mutation position)
         self.cz = 0  # number of channels in model
-        self.deltas_encoder = 0  # use encoder on 'all deltas'
 
     def __str__(self):
         return f'Model CFG:\n{self.attn_len=}\n{self.heads=}\n{self.seq_emb_size=}\n' \

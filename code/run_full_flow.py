@@ -93,7 +93,6 @@ def main():
     log(f"{CFG['flow_data_creation']['variants_cutoff']=}")
     log(f"{CFG['general']['gamma']=}")
     log(f"{CFG['general']['step']=}")
-    log(f"{CFG['general']['use_deltas_encoder']=}")
     log(f"{CFG['flow_train']['patience']=}")
     log(f"{CFG['general']['bins']=}")
     log(f"{CFG['flow_train']['alpha']=}")
@@ -259,7 +258,6 @@ if __name__ == '__main__':
     parser.add_argument('-sched', type=int, help='Use scheduler (1 or 0)', required=False)
     parser.add_argument('-gamma', type=float, help='Gamma param for LR scheduler', required=False)
     parser.add_argument('-step', type=int, help='Step param for LR scheduler', required=False)
-    parser.add_argument('-deltas_enc', type=int, help='Use encoder for deltas (1 or 0)', required=False)
     parser.add_argument('-patience', type=int, help='When to stop the training', required=False)
     parser.add_argument('-bins', type=int, help='Number of bins to split the data', required=False)
     parser.add_argument('-alpha', type=float, help='Parameter coefficient for loss', required=False)
@@ -291,8 +289,6 @@ if __name__ == '__main__':
         CFG['general']['gamma'] = str(args.gamma)
     if args.step is not None:
         CFG['general']['step'] = str(args.step)
-    if args.use_pdb is not None:
-        CFG['general']['use_deltas_encoder'] = str(args.deltas_enc)
     if args.patience is not None:
         CFG['flow_train']['patience'] = str(args.patience)
     if args.bins is not None:

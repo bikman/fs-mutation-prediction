@@ -99,7 +99,6 @@ class PrismScoreEmbDiffModel(nn.Module):
         self.diff_width = model_cfg.diff_width
         self.seq_emb_size = model_cfg.seq_emb_size
         self.heads = model_cfg.heads
-        self.use_deltas_encoder = model_cfg.deltas_encoder
 
         # create enlarger
         self.enlarger = nn.Sequential(
@@ -125,9 +124,6 @@ class PrismScoreEmbDiffModel(nn.Module):
         num_layers = model_cfg.attn_len
         emb_encoder_layer = WightedTransformerEncoderLayer(d_model=self.seq_emb_size, nhead=self.heads)
         self.emb_encoder = WeightedTransformerEncoder(emb_encoder_layer, num_layers=num_layers)
-        if self.use_deltas_encoder == 1:
-            dds_encoder_layer = WightedTransformerEncoderLayer(d_model=self.cz, nhead=self.heads)
-            self.dds_encoder = WeightedTransformerEncoder(dds_encoder_layer, num_layers=num_layers)
 
         # --- create complex MLP score predictor ---
         self.in_size = int(self.cz * (2 * self.diff_width + 1) * 3)
@@ -151,12 +147,6 @@ class PrismScoreEmbDiffModel(nn.Module):
     def forward(self, pid, pos, all_deltas_in, pos_enc, emb_sector, emb_diff_in, debug_data=None):
         all_deltas = self.enlarger(all_deltas_in)
 
-        dds_weights = None
-
-        # --- NOT IN USE ---
-        # if self.use_deltas_encoder == 1:
-        #     all_deltas, dds_weights = self.dds_encoder(all_deltas)
-
         emb_sector = self.seq_emb_reducer(emb_sector)
         emb_sector = emb_sector + pos_enc
 
@@ -172,19 +162,6 @@ class PrismScoreEmbDiffModel(nn.Module):
             ew_size = emb_weights.size()
             log(f'emb_weights.size={ew_size}')
             plot_tensor(emb_weights[0], folder, f'emb_weights.ep_{epoch}')
-
-            if self.use_deltas_encoder == 1 and dds_weights is not None:
-                dds_weights_size = dds_weights.size()
-                log(f'dds_weights.size={dds_weights_size}')
-                plot_tensor(dds_weights[0], folder, f'dds_weights.ep_{epoch}')
-
-            # emb_diff_in_size = emb_diff_in.size()
-            # log(f'emb_diff_in.size={emb_diff_in_size}')
-            # plot_tensor(emb_diff_in[0], folder, f'emb_diff_in.ep_{epoch}')
-
-            # all_deltas_in_size = all_deltas_in.size()
-            # log(f'all_deltas_in.size={all_deltas_in_size}')
-            # plot_tensor(all_deltas_in[0], folder, f'all_deltas_in.ep_{epoch}')
 
         x = self.flatten(all_deltas)
         y = self.flatten(emb_sector)

@@ -42,7 +42,6 @@ def _create_model_config():
     cfg.diff_width = int(CFG['general']['diff_len'])
     cfg.attn_len = int(CFG['general']['attn_len'])
     cfg.cz = int(CFG['general']['cz'])
-    cfg.deltas_encoder = int(CFG['general']['use_deltas_encoder'])
     return cfg
 
 
