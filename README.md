@@ -17,7 +17,7 @@ It is used to extract embeddings from an protein sequences. Enables SOTA inferen
 
 More info [here](https://github.com/facebookresearch/esm)
 
-Pretrained LLM file (1.3Gb) for embedder is [here](https://dl.fbaipublicfiles.com/fair-esm/models/esm_msa1b_t12_100M_UR50S.pt), other file (contact regression) can be found in 'esm' folder.
+Pretrained LLM file (1.3Gb) for embedder is [here](https://dl.fbaipublicfiles.com/fair-esm/models/esm_msa1b_t12_100M_UR50S.pt), other file (contact regression) can be found in 'esm1b_msa' folder.
 
 ### Data
 
