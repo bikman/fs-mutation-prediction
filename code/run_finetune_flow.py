@@ -18,7 +18,7 @@ from prism_score_train import create_model
 from run_prism_data_creation import create_seq_embedding_dict, create_seq_embedder, _load_diff_embeddings, \
     calculate_bins
 from run_prism_data_creation import log
-from utils import CFG, DEVICE, setup_reports, get_protein_files_dict, MODELS_FOLDER, AA_ALPHABETICAL, DIFF_LEN
+from utils import CFG, DEVICE, setup_reports, get_protein_files_dict, MODELS_FOLDER, AA_ALPHABETICAL, DIFF_LEN, EMB_SIZE
 
 
 def create_result_txt(report_path, protein_filename, train_res):
@@ -105,7 +105,7 @@ def main():
         log('=== Creating model config ===')
         cfg = ModelConfig()
         cfg.heads = int(CFG['flow_train']['heads'])
-        cfg.seq_emb_size = int(CFG['general']['seq_emb_size'])
+        cfg.seq_emb_size = EMB_SIZE
         cfg.diff_width = DIFF_LEN
         cfg.attn_len = int(CFG['general']['attn_len'])
         cfg.cz = int(CFG['general']['cz'])
@@ -164,7 +164,6 @@ def main():
             log('Calculated v_pred_min and v_pred_max')
             log(f'{str(v_pred_min)}')
             log(f'{str(v_pred_max)}')
-
 
         eval_ft_split, train_ft_split, eval_ft_quantile_transformer = \
             create_fine_tune_diff_splits(pname_to_seq_embedding, min_max_eval_v)

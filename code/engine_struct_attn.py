@@ -434,19 +434,6 @@ def plot_tensor(input_tensor, out_folder, prefix):
 
 
 if __name__ == '__main__':
-    # seq = torch.FloatTensor([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
-    # res = get_position_encoding(seq, 128)
     pass
 
-    # from data_model import ModelConfig
-    # model_cfg = ModelConfig()
-    # model_cfg.diff_width = 15
-    # model_cfg.heads = 8
-    # model_cfg.seq_emb_size = 768
-    # model = PrismScoreEmbDiffModel(model_cfg)
-    # print(model)
-    # all_deltas = torch.rand(8, 31, 41)
-    # src_dst = torch.rand(8, 32, 20)
-    # emb_diff = torch.rand(8, 31, 768)
-    # out = model(all_deltas, src_dst, emb_diff)
-    # print(out.size())
+

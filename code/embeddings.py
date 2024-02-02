@@ -6,7 +6,7 @@ from sys import platform
 import esm
 import torch
 
-from utils import ESM_MODEL, ESM_REGRESSION, DEVICE
+from utils import ESM_MODEL, ESM_REGRESSION, DEVICE, EMB_SIZE
 
 
 class EsmEmbedder(object):
@@ -70,11 +70,11 @@ class EsmEmbeddingFactory(object):
 
     @staticmethod
     def get_emb_dim():
-        return 768
+        return EMB_SIZE
 
     @staticmethod
     def get_embedder():
-        EsmEmbeddingFactory.DIMENSION = 768
+        EsmEmbeddingFactory.DIMENSION = EMB_SIZE
         sequence_embedder = EsmMsaEmbedding()
         return sequence_embedder
 

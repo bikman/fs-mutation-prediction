@@ -62,6 +62,7 @@ if torch.cuda.is_available():
 MAX_SEQUENCE = 1023  # otherwise ESM embedder will fail
 NUM_QUANTILES = 4
 DIFF_LEN = 15
+EMB_SIZE = 768
 
 AMINO_TO_LETTER = {
     'ALA': 'A',
