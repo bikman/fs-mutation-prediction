@@ -4,7 +4,7 @@ The code for quantitative prediction of single point mutations impact on experim
 
 ### Usage
 
-First of all, data preprocessing is needed to run the model training.
+Data preprocessing is needed to run the model training.
 
 Run data creation script with argument specifying where to put the resulted dumps. Each dump file contains all the protein mutations, scores and embeddings.
 
@@ -16,14 +16,11 @@ After creation of pickled data with embeddings per protein (might take hours) th
 
 ### Required libraries
 
-Our model data is created with ESM-1b embedder. 
-It is used to extract embeddings from the protein sequences. Enables SOTA inference of structure. Released with [Rao et al. 2021](https://www.biorxiv.org/content/10.1101/2021.02.12.430858v2) 
-(ICML'21 version, June 2021).
+Wild type and mutated sequence represetnations are generated using ESM-1b model [Rao et al. 2021](https://www.biorxiv.org/content/10.1101/2021.02.12.430858v2) 
+(ICML'21 version, June 2021). 
+More info is [here](https://github.com/facebookresearch/esm)
 
-
-More info [here](https://github.com/facebookresearch/esm)
-
-Pretrained LLM file (1.3Gb) for embedder is [here](https://dl.fbaipublicfiles.com/fair-esm/models/esm_msa1b_t12_100M_UR50S.pt), other file (contact regression) can be found in 'esm1b_msa' folder.
+Pretrained LLM model (1.3Gb) is [here](https://dl.fbaipublicfiles.com/fair-esm/models/esm_msa1b_t12_100M_UR50S.pt), other file (contact regression) can be found in 'esm1b_msa' folder.
 
 ### Data
 
