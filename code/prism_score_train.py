@@ -45,7 +45,7 @@ def _create_model_config():
     return cfg
 
 
-def _choose_optimizer(model, pretrained_enabled):
+def _choose_optimizer(model):
     """
     Choose optimizer according to configuration value
     @param pretrained_enabled: should we use LR for pretrained flow
@@ -53,8 +53,6 @@ def _choose_optimizer(model, pretrained_enabled):
     @return: optimizer object
     """
     lr = float(CFG['flow_train']['lr'])
-    if pretrained_enabled != 0:
-        lr = float(CFG['flow_pretrained']['lr'])
     res = torch.optim.Adam(model.parameters(), lr=lr)  # ADAM
     return res
 
@@ -205,11 +203,10 @@ def create_acc_loss_plots(report_path, train_res):
     print(f'Created {plot_path}')
 
 
-def fill_train_parameters(model, pretrained_enabled, report_path):
+def fill_train_parameters(model, report_path):
     """
     Create train parameters
     @param model: model to train
-    @param pretrained_enabled: is model was pretrained
     @param report_path: folder for reporting
     @return: TrainParameters object
     """
@@ -217,14 +214,14 @@ def fill_train_parameters(model, pretrained_enabled, report_path):
     train_params.model = model
     train_params.loss = torch.nn.MSELoss()
     train_params.loss2 = torch.nn.MSELoss()
-    train_params.optimizer = _choose_optimizer(model, pretrained_enabled)
+    train_params.optimizer = _choose_optimizer(model)
     _create_train_scheduler(train_params)
     train_params.model_path = os.path.join(report_path, model.file_name)
     train_params.report_path = report_path
     train_params.epochs = int(CFG['flow_train']['epochs'])
     train_params.patience = int(CFG['flow_train']['patience'])
     train_params.loader_pairs = []
-    train_params.bins = int(CFG['general']['bins'])
+    train_params.bins = 10
     train_params.alpha = float(CFG['flow_train']['alpha'])
     return train_params
 
@@ -234,13 +231,12 @@ def _create_train_scheduler(train_params):
     Creates scheduler for training (if specified)
     @param train_params: training parameters
     """
-    if int(CFG['general']['use_scheduler']) > 0:
-        gamma = float(CFG['general']['gamma'])
-        log(f'{gamma=}')
-        step_size = int(CFG['general']['step'])
-        log(f'{step_size=}')
-        # ---- Regular Lr scheduler ----
-        train_params.scheduler = StepLR(train_params.optimizer, step_size=step_size, gamma=gamma)
+    gamma = float(CFG['general']['gamma'])
+    log(f'{gamma=}')
+    step_size = int(CFG['general']['step'])
+    log(f'{step_size=}')
+    # ---- Regular Lr scheduler ----
+    train_params.scheduler = StepLR(train_params.optimizer, step_size=step_size, gamma=gamma)
 
 
 if __name__ == '__main__':

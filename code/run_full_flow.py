@@ -86,7 +86,6 @@ def main():
     log(f"{CFG['general']['eval_protein_file_number']=}")
     log(f"{CFG['general']['model']=}")
     log(f"{CFG['general']['attn_len']=}")
-    log(f"{CFG['general']['use_scheduler']=}")
     log(f"{CFG['flow_train']['lr']=}")
     log(f"{CFG['flow_train']['epochs']=}")
     log(f"{CFG['general']['train_set_count']=}")
@@ -94,7 +93,6 @@ def main():
     log(f"{CFG['general']['gamma']=}")
     log(f"{CFG['general']['step']=}")
     log(f"{CFG['flow_train']['patience']=}")
-    log(f"{CFG['general']['bins']=}")
     log(f"{CFG['flow_train']['alpha']=}")
     log(f"{CFG['flow_data_creation']['normalize_scores']=}")
     log(f"{CFG['fine_tuning_data_creation']['normalize_scores']=}")
@@ -123,7 +121,7 @@ def main():
     log('=' * 100)
 
     model = create_model()
-    train_params = fill_train_parameters(model, 0, report_path)
+    train_params = fill_train_parameters(model, report_path)
 
     # --------- Train model ---------------
     train_res = run_train(train_split, valid_split, train_params)
@@ -255,11 +253,9 @@ if __name__ == '__main__':
     parser.add_argument('-train_count', type=int, help='Number of protein in train set', required=False)
     parser.add_argument('-v_cutoff', type=int, help='Percentage of variants to be taken from data', required=False)
     parser.add_argument('-attn', type=int, help='Length of attention neighbors', required=False)
-    parser.add_argument('-sched', type=int, help='Use scheduler (1 or 0)', required=False)
     parser.add_argument('-gamma', type=float, help='Gamma param for LR scheduler', required=False)
     parser.add_argument('-step', type=int, help='Step param for LR scheduler', required=False)
     parser.add_argument('-patience', type=int, help='When to stop the training', required=False)
-    parser.add_argument('-bins', type=int, help='Number of bins to split the data', required=False)
     parser.add_argument('-alpha', type=float, help='Parameter coefficient for loss', required=False)
     parser.add_argument('-norm_scores', type=int, help='Normalize scores train & eval', required=False)
     parser.add_argument('-norm_scores_ft', type=int, help='Normalize scores FT', required=False)
@@ -275,8 +271,6 @@ if __name__ == '__main__':
         CFG['general']['model'] = str(args.model)
     if args.attn is not None:
         CFG['general']['attn_len'] = str(args.attn)
-    if args.sched is not None:
-        CFG['general']['use_scheduler'] = str(args.sched)
     if args.lr is not None:
         CFG['flow_train']['lr'] = str(args.lr)
     if args.epochs is not None:
@@ -291,8 +285,6 @@ if __name__ == '__main__':
         CFG['general']['step'] = str(args.step)
     if args.patience is not None:
         CFG['flow_train']['patience'] = str(args.patience)
-    if args.bins is not None:
-        CFG['general']['bins'] = str(args.bins)
     if args.alpha is not None:
         CFG['flow_train']['alpha'] = str(args.alpha)
     if args.norm_scores is not None:

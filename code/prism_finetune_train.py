@@ -59,18 +59,17 @@ def fill_fine_tune_train_params(model, report_path):
     lr = float(CFG['flow_fine_tune']['lr'])
     log(f'FT {lr=}')
     train_params.optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-    if int(CFG['general']['use_scheduler']) > 0:
-        gamma = float(CFG['general']['gamma'])
-        log(f'{gamma=}')
-        step_size = int(CFG['general']['step'])
-        log(f'{step_size=}')
-        train_params.scheduler = StepLR(train_params.optimizer, step_size=step_size, gamma=gamma)
+    gamma = float(CFG['general']['gamma'])
+    log(f'{gamma=}')
+    step_size = int(CFG['general']['step'])
+    log(f'{step_size=}')
+    train_params.scheduler = StepLR(train_params.optimizer, step_size=step_size, gamma=gamma)
     train_params.model_path = os.path.join(report_path, model.file_name)
     epochs = int(CFG['flow_fine_tune']['epochs'])
     log(f'Fine tune epochs: {epochs}')
     train_params.epochs = epochs
     train_params.loader_pairs = []
-    train_params.bins = int(CFG['general']['bins'])
+    train_params.bins = 10
     train_params.alpha = float(CFG['flow_fine_tune']['alpha'])
     log(f'Fine tune alpha: {train_params.alpha}')
     return train_params

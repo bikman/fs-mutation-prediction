@@ -50,7 +50,6 @@ def main():
     log(f"{CFG['flow_train']['lr']=}")
     log(f"{CFG['flow_fine_tune']['epochs']=}")
     log(f"{CFG['flow_fine_tune']['loops']=}")
-    log(f"{CFG['general']['bins']=}")
     log(f"{CFG['flow_fine_tune']['alpha']=}")
     log(f"{CFG['fine_tuning_data_creation']['add_max_v']=}")
     log(f"{CFG['fine_tuning_data_creation']['data_count']=}")
@@ -213,7 +212,6 @@ if __name__ == '__main__':
     parser.add_argument('-model', type=int, help='Model to use for train/eval', required=False)
     parser.add_argument('-lr', type=float, help='Learning rate', required=False)
     parser.add_argument('-epochs', type=int, help='Number of epochs', required=False)
-    parser.add_argument('-bins', type=int, help='Number of bins to split the data', required=False)
     parser.add_argument('-alpha', type=float, help='Parameter coefficient for loss', required=False)
     parser.add_argument('-data_count', type=str, help='Number of mutations to run fine tuning', required=False)
     parser.add_argument('-norm_scores', type=str, help='Normalize scores for fine-tuning', required=False)
@@ -232,8 +230,6 @@ if __name__ == '__main__':
         CFG['flow_train']['lr'] = str(args.lr)
     if args.epochs is not None:
         CFG['flow_fine_tune']['epochs'] = str(args.epochs)
-    if args.bins is not None:
-        CFG['general']['bins'] = str(args.bins)
     if args.alpha is not None:
         CFG['flow_fine_tune']['alpha'] = str(args.alpha)
     if args.data_count is not None:

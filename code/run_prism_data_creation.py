@@ -313,7 +313,7 @@ def calculate_bins(prism_data_list):
     Assigns bin to every variant
     @param prism_data_list: list of prism data objects
     """
-    num_bins = int(CFG['general']['bins'])
+    num_bins = 10
     log(f'{num_bins=}')
     log(f'adding bins...')
     for prism_data in prism_data_list:
