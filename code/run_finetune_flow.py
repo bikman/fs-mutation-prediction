@@ -56,7 +56,6 @@ def main():
     log(f"{CFG['fine_tuning_data_creation']['normalize_scores']=}")
     log(f"{CFG['fine_tuning_data_creation']['normalize_deltas']=}")
     log(f"{CFG['flow_fine_tune']['batch_norm']=}")
-    log(f"{CFG['flow_fine_tune']['use_min_max']=}")
     log('=' * 100)
 
     loops = int(CFG['flow_fine_tune']['loops'])
@@ -124,46 +123,42 @@ def main():
         log(f'From: {model_path}')
 
         # --- find eval min_max here ---
-        min_max_eval_v = None
-        use_min_max = int(CFG['flow_fine_tune']['use_min_max'])
-        log(f'{use_min_max=}')
-        if use_min_max == 1:
-            log('$ - using min max in FT samples -$')
-            # load eval result
-            eval_res_path = os.path.join(MODELS_FOLDER, f'model_{model_num}_pretrain', str(ep), 'eval_result.pkl')
-            with open(eval_res_path, "rb") as f:
-                test_eval_res = pickle.load(f)
-            # find min and max variants from evaluation result
-            min_pred_ndx = int(numpy.argmin(test_eval_res.pred_values))
-            max_pred_ndx = int(numpy.argmax(test_eval_res.pred_values))
-            max_pred_src = int(test_eval_res.src_indices[max_pred_ndx])
-            max_pred_dst = int(test_eval_res.dst_indices[max_pred_ndx])
-            min_pred_src = int(test_eval_res.src_indices[min_pred_ndx])
-            min_pred_dst = int(test_eval_res.dst_indices[min_pred_ndx])
-            min_pos = int(test_eval_res.pos_values[min_pred_ndx])
-            max_pos = int(test_eval_res.pos_values[max_pred_ndx])
-            min_aa_src = AA_ALPHABETICAL[min_pred_src]
-            min_aa_dst = AA_ALPHABETICAL[min_pred_dst]
-            max_aa_src = AA_ALPHABETICAL[max_pred_src]
-            max_aa_dst = AA_ALPHABETICAL[max_pred_dst]
-            min_true_val = test_eval_res.true_values[min_pred_ndx]
-            max_true_val = test_eval_res.true_values[max_pred_ndx]
-            v_pred_min = Variant()
-            v_pred_min.position = min_pos
-            v_pred_min.score_orig = min_true_val
-            v_pred_min.score = min_true_val
-            v_pred_min.aa_from = min_aa_src
-            v_pred_min.aa_to = min_aa_dst
-            v_pred_max = Variant()
-            v_pred_max.position = max_pos
-            v_pred_max.score_orig = max_true_val
-            v_pred_max.score = max_true_val
-            v_pred_max.aa_from = max_aa_src
-            v_pred_max.aa_to = max_aa_dst
-            min_max_eval_v = [v_pred_min, v_pred_max]
-            log('Calculated v_pred_min and v_pred_max')
-            log(f'{str(v_pred_min)}')
-            log(f'{str(v_pred_max)}')
+        log('$ - using min max in FT samples -$')
+        # load eval result
+        eval_res_path = os.path.join(MODELS_FOLDER, f'model_{model_num}_pretrain', str(ep), 'eval_result.pkl')
+        with open(eval_res_path, "rb") as f:
+            test_eval_res = pickle.load(f)
+        # find min and max variants from evaluation result
+        min_pred_ndx = int(numpy.argmin(test_eval_res.pred_values))
+        max_pred_ndx = int(numpy.argmax(test_eval_res.pred_values))
+        max_pred_src = int(test_eval_res.src_indices[max_pred_ndx])
+        max_pred_dst = int(test_eval_res.dst_indices[max_pred_ndx])
+        min_pred_src = int(test_eval_res.src_indices[min_pred_ndx])
+        min_pred_dst = int(test_eval_res.dst_indices[min_pred_ndx])
+        min_pos = int(test_eval_res.pos_values[min_pred_ndx])
+        max_pos = int(test_eval_res.pos_values[max_pred_ndx])
+        min_aa_src = AA_ALPHABETICAL[min_pred_src]
+        min_aa_dst = AA_ALPHABETICAL[min_pred_dst]
+        max_aa_src = AA_ALPHABETICAL[max_pred_src]
+        max_aa_dst = AA_ALPHABETICAL[max_pred_dst]
+        min_true_val = test_eval_res.true_values[min_pred_ndx]
+        max_true_val = test_eval_res.true_values[max_pred_ndx]
+        v_pred_min = Variant()
+        v_pred_min.position = min_pos
+        v_pred_min.score_orig = min_true_val
+        v_pred_min.score = min_true_val
+        v_pred_min.aa_from = min_aa_src
+        v_pred_min.aa_to = min_aa_dst
+        v_pred_max = Variant()
+        v_pred_max.position = max_pos
+        v_pred_max.score_orig = max_true_val
+        v_pred_max.score = max_true_val
+        v_pred_max.aa_from = max_aa_src
+        v_pred_max.aa_to = max_aa_dst
+        min_max_eval_v = [v_pred_min, v_pred_max]
+        log('Calculated v_pred_min and v_pred_max')
+        log(f'{str(v_pred_min)}')
+        log(f'{str(v_pred_max)}')
 
         eval_ft_split, train_ft_split, eval_ft_quantile_transformer = \
             create_fine_tune_diff_splits(pname_to_seq_embedding, min_max_eval_v)
@@ -214,7 +209,6 @@ if __name__ == '__main__':
     parser.add_argument('-norm_scores', type=str, help='Normalize scores for fine-tuning', required=False)
     parser.add_argument('-norm_deltas', type=str, help='Normalize deltas for fine-tuning', required=False)
     parser.add_argument('-batch_norm', type=int, help='Normalize data per batch for fine-tuning', required=False)
-    parser.add_argument('-use_min_max', type=int, help='Use min/max replacement in FT sample', required=False)
     args = parser.parse_args()
 
     if args.prot_set is not None:
@@ -237,8 +231,6 @@ if __name__ == '__main__':
         CFG['fine_tuning_data_creation']['normalize_deltas'] = str(args.norm_deltas)
     if args.batch_norm is not None:
         CFG['flow_fine_tune']['batch_norm'] = str(args.batch_norm)
-    if args.use_min_max is not None:
-        CFG['flow_fine_tune']['use_min_max'] = str(args.use_min_max)
 
     # NOTE: print command line args CFG inside main
 
