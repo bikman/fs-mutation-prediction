@@ -19,5 +19,7 @@ More info [here](https://github.com/facebookresearch/esm)
 
 Pretrained LLM file (1.3Gb) for embedder is [here](https://dl.fbaipublicfiles.com/fair-esm/models/esm_msa1b_t12_100M_UR50S.pt)
 
+### Data
 
+MAVE data files are included in the 'mave' folder
 
