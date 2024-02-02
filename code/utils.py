@@ -54,7 +54,6 @@ PRISM_FOLDER = r'C:\DATASETS\ECOD_MAVE\mave'
 if platform == "linux" or platform == "linux2":
     PRISM_FOLDER = r'/root/code/data/mave'
 
-
 # device definition
 DEVICE = torch.device('cpu')
 if torch.cuda.is_available():
@@ -243,34 +242,7 @@ def get_protein_files_dict():
             f'Eval protein must be from protein set (set index: {protein_set_index}) \n'
             f'List of selected proteins: {list_of_proteins}')
 
-    # use proteins count
-    train_set_count = int(CFG['general']['train_set_count'])
-
-    # corner case - take all proteins according to PROTEINS_GROUPS_DICT
-    if train_set_count >= len(ALL_PROTEIN_FILES_DICT):
-        assert eval_protein_file_number in proteins_dictionary
-        return proteins_dictionary
-    if 0 >= train_set_count:
-        raise Exception(f'Illegal train set count = {train_set_count}. Must be 1 or more.')
-
-    res_dict = dict(list(proteins_dictionary.items())[:train_set_count])
-    if eval_protein_file_number in res_dict.keys():
-        # eval protein in train set - need to get next protein
-        additional_key = train_set_count + 1
-        try:
-            # add next protein (as eval) to result dictionary
-            res_dict[additional_key] = proteins_dictionary[additional_key]
-        except Exception as e:
-            raise Exception(f'Cannot get eval protein by additional index: {additional_key}, error: {e}')
-    else:
-        try:
-            # add eval protein to result dictionary
-            res_dict[eval_protein_file_number] = proteins_dictionary[eval_protein_file_number]
-        except Exception as e:
-            raise Exception(f'Cannot get eval protein by user selected index: {eval_protein_file_number}, error: {e}')
-    assert eval_protein_file_number in res_dict
-    assert len(res_dict) == train_set_count + 1
-    return res_dict
+    return proteins_dictionary
 
 
 def normalize_list(values):

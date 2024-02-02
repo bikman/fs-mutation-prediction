@@ -88,7 +88,6 @@ def main():
     log(f"{CFG['general']['attn_len']=}")
     log(f"{CFG['flow_train']['lr']=}")
     log(f"{CFG['flow_train']['epochs']=}")
-    log(f"{CFG['general']['train_set_count']=}")
     log(f"{CFG['flow_data_creation']['variants_cutoff']=}")
     log(f"{CFG['general']['gamma']=}")
     log(f"{CFG['general']['step']=}")
@@ -250,7 +249,6 @@ if __name__ == '__main__':
     parser.add_argument('-model', type=int, help='Model to use for train/eval', required=False)
     parser.add_argument('-lr', type=float, help='Learning rate', required=False)
     parser.add_argument('-epochs', type=int, help='Number of epochs', required=False)
-    parser.add_argument('-train_count', type=int, help='Number of protein in train set', required=False)
     parser.add_argument('-v_cutoff', type=int, help='Percentage of variants to be taken from data', required=False)
     parser.add_argument('-attn', type=int, help='Length of attention neighbors', required=False)
     parser.add_argument('-gamma', type=float, help='Gamma param for LR scheduler', required=False)
@@ -275,8 +273,6 @@ if __name__ == '__main__':
         CFG['flow_train']['lr'] = str(args.lr)
     if args.epochs is not None:
         CFG['flow_train']['epochs'] = str(args.epochs)
-    if args.train_count is not None:
-        CFG['general']['train_set_count'] = str(args.train_count)
     if args.v_cutoff is not None:
         CFG['flow_data_creation']['variants_cutoff'] = str(args.v_cutoff)
     if args.gamma is not None:
