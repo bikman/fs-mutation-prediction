@@ -1,5 +1,5 @@
 .idea/
-reports/
+*_report/
 *.pyc
 *.pkl
 *.log
