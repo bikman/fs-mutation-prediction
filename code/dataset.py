@@ -299,13 +299,6 @@ class PrismDiffEmbFineTuneDatasetCreator(object):
                     variants = random.sample(variants, self.data_count)  # choose needed amount of mutations
                     log(f'sampled {len(variants)} variants for FT')
 
-            if int(CFG['fine_tuning_data_creation']['add_max_v']) == 1:
-                log('Adding FT max_v')
-                # NOTE: add maximal original score mutation to FT selection
-                max_orig_score_v = max(prism_data.variants, key=lambda v: v.score_orig)
-                if max_orig_score_v not in variants:
-                    variants.append(max_orig_score_v)
-
             # check here what min and max value were sampled for FT
             # variants - are sampled for FT
             self.min_sampled_v = min(variants, key=lambda v: v.score_orig)

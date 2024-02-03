@@ -51,7 +51,6 @@ def main():
     log(f"{CFG['flow_fine_tune']['epochs']=}")
     log(f"{CFG['flow_fine_tune']['loops']=}")
     log(f"{CFG['flow_fine_tune']['alpha']=}")
-    log(f"{CFG['fine_tuning_data_creation']['add_max_v']=}")
     log(f"{CFG['fine_tuning_data_creation']['data_count']=}")
     log(f"{CFG['fine_tuning_data_creation']['normalize_scores']=}")
     log('=' * 100)
