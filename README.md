@@ -12,7 +12,9 @@ EMS embedder files location must be specified for processing the sequence embedd
 
 The files can be downloaded from here: [Model ESM1b](https://dl.fbaipublicfiles.com/fair-esm/models/esm1b_t33_650M_UR50S.pt) and [Regression weights ESM1b](https://dl.fbaipublicfiles.com/fair-esm/regression/esm1b_t33_650M_UR50S-contact-regression.pt)
 
-Run data creation script with argument specifying where to put the resulted dumps. Each dump file contains all the protein mutations, scores and embeddings.
+Run data creation script with argument specifying where to put the resulted dumps. 
+
+Each dump file contains all the protein mutations, scores and embeddings.
 
 ```
 run_prism_data_creation.py -dump_root [path_to_folder]
