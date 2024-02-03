@@ -12,7 +12,13 @@ Run data creation script with argument specifying where to put the resulted dump
 run_prism_data_creation.py -dump_root [path_to_folder]
 ```
 
+This will create pickled files:
+
+![image](https://github.com/bikman/fs-mutation-prediction/assets/82976389/d1676825-3cc1-4730-a6fd-94017d8d7849)
+
 After creation of pickled data with embeddings per protein (might take hours) the model can be run for training and evaluation.
+
+To run a model for zero-shot pre-train process, specify where MAVE and dump files are located.
 
 ### Required libraries
 
