@@ -44,8 +44,6 @@ Wild type and mutated sequence represetnations are generated using ESM-1b model 
 
 More info is [here](https://github.com/facebookresearch/esm)
 
-Pretrained LLM model (1.3Gb) is [here](https://dl.fbaipublicfiles.com/fair-esm/models/esm_msa1b_t12_100M_UR50S.pt), other file (contact regression) can be found in 'esm1b_msa' folder.
-
 ### Data
 
 MAVE data files are included in the 'mave' folder.
