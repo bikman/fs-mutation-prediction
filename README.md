@@ -29,10 +29,10 @@ To run a model for zero-shot pre-train process, specify where data dump files ar
 
 After creation of pickled data with embeddings per protein (might take hours) the model can be run for training and evaluation.
 
-Run model for zero-shot and fine-tuning, while X is an integer number from 1 to 39 according to a proteins list specified in **utils.py**
+Run model for zero-shot and fine-tuning, while **\[X\]** is an integer number from 1 to 39 according to a proteins list specified in **utils.py**
 
 ```
-run_full_flow.py -ep X 
+run_full_flow.py -ep [X] 
 ```
 
 ### Required libraries
