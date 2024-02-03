@@ -5,8 +5,6 @@ This data is put to CSV to be moved to Excel and plots
 import os
 import re
 
-from utils import RESULTS_PATH
-
 
 def fetch_ft_results_from_folder(all_res_folder):
     res_ids = [res_id for res_id in os.listdir(all_res_folder)]

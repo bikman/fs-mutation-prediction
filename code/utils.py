@@ -13,23 +13,26 @@ import numpy as np
 import torch
 from sklearn import preprocessing
 
-# current time
-TIMESTAMP = datetime.now().strftime("%Y_%m_%d-%H_%M_%S_%f")
+TIMESTAMP = datetime.now().strftime("%Y_%m_%d-%H_%M_%S_%f")  # current time
+# --------------------------------------------------------------------------
+# windows OS only
+# --------------------------------------------------------------------------
 REPORT_ROOT = 'reports'
 CONFIG_FILE = 'config.win.ini'
-ESM_MODEL = r'C:\MODELS\esm1b_msa\esm_msa1b_t12_100M_UR50S.pt'
-ESM_REGRESSION = r'C:\MODELS\esm1b_msa\esm_msa1b_t12_100M_UR50S-contact-regression.pt'
+ESM_MODEL = r'..\esm1b_msa\esm_msa1b_t12_100M_UR50S.pt'
+ESM_REGRESSION = r'..\esm1b_msa\esm_msa1b_t12_100M_UR50S-contact-regression.pt'
 MODELS_FOLDER = r'models'
 LOG_FOLDER = r'logs'
-RESULTS_PATH = r'D:\RUN_RESULTS'  # windows only
+# --------------------------------------------------------------------------
+# linux OS only
+# --------------------------------------------------------------------------
 if platform == "linux" or platform == "linux2":
     REPORT_ROOT = '/root/code/reports'
+    CONFIG_FILE = '/root/code/config.linux.ini'
     ESM_MODEL = r'/root/code/esm_pretrain/esm_msa1b_t12_100M_UR50S.pt'
     ESM_REGRESSION = r'/root/code/esm_pretrain/esm_msa1b_t12_100M_UR50S-contact-regression.pt'
-    CONFIG_FILE = '/root/code/config.linux.ini'
     MODELS_FOLDER = r'/root/code/models'
     LOG_FOLDER = r'/root/code/logs'
-    RESULTS_PATH = r'/root/code/reports'  # windows only
 
 
 def load_config():
