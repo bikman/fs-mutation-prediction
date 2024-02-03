@@ -1,0 +1,1 @@
+This folder can be used to save the pickled results of data preprocessing.
