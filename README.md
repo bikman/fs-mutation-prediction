@@ -6,7 +6,9 @@ The code for quantitative prediction of single point mutations impact on experim
 
 Data preprocessing is needed to run the model training.
 
-[ESM embedder](https://github.com/facebookresearch/esm) files location must be specified for processing the sequence embeddings. The paths are defined in **utils.py**.
+Wild type and mutated sequence represetnations are generated using ESM-1b model [Rao et al. 2021](https://www.biorxiv.org/content/10.1101/2021.02.12.430858v2) 
+(ICML'21 version, June 2021). <br/> [ESM embedder](https://github.com/facebookresearch/esm) files location must be specified for processing the sequence embeddings. 
+<br/>The paths are defined in **utils.py**.
 
 ![image](https://github.com/bikman/fs-mutation-prediction/assets/82976389/543804b9-3b0a-4736-8e42-d79b083c202e)
 
@@ -36,13 +38,6 @@ Run model for zero-shot and fine-tuning, while **\[X\]** is an integer number fr
 ```
 run_full_flow.py -ep [X] 
 ```
-
-### Required libraries
-
-Wild type and mutated sequence represetnations are generated using ESM-1b model [Rao et al. 2021](https://www.biorxiv.org/content/10.1101/2021.02.12.430858v2) 
-(ICML'21 version, June 2021). 
-
-More info is [here](https://github.com/facebookresearch/esm)
 
 ### Data
 
