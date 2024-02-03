@@ -22,7 +22,9 @@ This will create pickled files:
 
 ![image](https://github.com/bikman/fs-mutation-prediction/assets/82976389/d1676825-3cc1-4730-a6fd-94017d8d7849)
 
-To run a model for zero-shot pre-train process, specify where MAVE and dump files are located.
+To run a model for zero-shot pre-train process, specify where data dump files are located (parameter in **config.win.ini** or **config.linux.ini**)
+
+![image](https://github.com/bikman/fs-mutation-prediction/assets/82976389/f46e4de4-7c59-4736-92e5-a3927977aa53)
 
 
 After creation of pickled data with embeddings per protein (might take hours) the model can be run for training and evaluation.
