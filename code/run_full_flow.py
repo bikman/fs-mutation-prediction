@@ -90,7 +90,6 @@ def main():
     log(f"{CFG['flow_train']['epochs']=}")
     log(f"{CFG['general']['step']=}")
     log(f"{CFG['flow_train']['patience']=}")
-    log(f"{CFG['flow_data_creation']['normalize_scores']=}")
     log('=' * 100)
 
     log('=' * 100)
@@ -244,7 +243,6 @@ if __name__ == '__main__':
     parser.add_argument('-attn', type=int, help='Length of attention neighbors', required=False)
     parser.add_argument('-step', type=int, help='Step param for LR scheduler', required=False)
     parser.add_argument('-patience', type=int, help='When to stop the training', required=False)
-    parser.add_argument('-norm_scores', type=int, help='Normalize scores train & eval', required=False)
     args = parser.parse_args()
 
     if args.prot_set is not None:
@@ -263,8 +261,6 @@ if __name__ == '__main__':
         CFG['general']['step'] = str(args.step)
     if args.patience is not None:
         CFG['flow_train']['patience'] = str(args.patience)
-    if args.norm_scores is not None:
-        CFG['flow_data_creation']['normalize_scores'] = str(args.norm_scores)
 
 
 

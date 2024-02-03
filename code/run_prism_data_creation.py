@@ -343,12 +343,9 @@ def create_diff_emb_splits():
 
     calculate_bins(prism_data_list)
 
-    normalize_enabled = int(CFG['flow_data_creation']['normalize_scores'])
-    log(f'{normalize_enabled=}')
-    if normalize_enabled == 1:
-        log(f'Performing train scores normalization...')
-        normalize_scores_only(prism_data_list)
-        log(f'done!')
+    log(f'Performing train scores normalization...')
+    normalize_scores_only(prism_data_list)
+    log(f'done!')
 
     total_variants_count = sum([len(d.variants) for d in prism_data_list])
     log(f'{total_variants_count=}')
