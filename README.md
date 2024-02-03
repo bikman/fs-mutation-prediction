@@ -53,3 +53,5 @@ Several configuration files are provided for specifying various parameters of th
 
 ![image](https://github.com/bikman/fs-mutation-prediction/assets/82976389/b1720e55-acbb-4378-85c5-88797530ee8c)
 
+One can spicify size of the model (number of channels, number of attention layers) and also training parameters like learning rate, number of epochs, patience, etc..
+
