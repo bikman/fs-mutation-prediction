@@ -4,4 +4,5 @@ reports/
 *.pkl
 *.log
 *.pt
+esm_msa1b_t12_100M_UR50S.pt
 !esm_msa1b_t12_100M_UR50S-contact-regression.pt
