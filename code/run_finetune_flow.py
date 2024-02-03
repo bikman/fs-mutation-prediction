@@ -52,7 +52,6 @@ def main():
     log(f"{CFG['flow_fine_tune']['loops']=}")
     log(f"{CFG['flow_fine_tune']['alpha']=}")
     log(f"{CFG['fine_tuning_data_creation']['data_count']=}")
-    log(f"{CFG['fine_tuning_data_creation']['normalize_scores']=}")
     log('=' * 100)
 
     loops = int(CFG['flow_fine_tune']['loops'])
@@ -203,7 +202,6 @@ if __name__ == '__main__':
     parser.add_argument('-epochs', type=int, help='Number of epochs', required=False)
     parser.add_argument('-alpha', type=float, help='Parameter coefficient for loss', required=False)
     parser.add_argument('-data_count', type=str, help='Number of mutations to run fine tuning', required=False)
-    parser.add_argument('-norm_scores', type=str, help='Normalize scores for fine-tuning', required=False)
     args = parser.parse_args()
 
     if args.prot_set is not None:
@@ -220,9 +218,6 @@ if __name__ == '__main__':
         CFG['flow_fine_tune']['alpha'] = str(args.alpha)
     if args.data_count is not None:
         CFG['fine_tuning_data_creation']['data_count'] = str(args.data_count)
-    if args.norm_scores is not None:
-        CFG['fine_tuning_data_creation']['normalize_scores'] = str(args.norm_scores)
-
 
     # NOTE: print command line args CFG inside main
 

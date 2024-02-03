@@ -67,13 +67,6 @@ def create_fine_tune_diff_splits(pname_to_seq_embedding, min_max_eval_vs=None):
 
     calculate_bins(prism_data_list)
 
-    norm_ft_scores = int(CFG['fine_tuning_data_creation']['normalize_scores'])
-    if norm_ft_scores == 1:
-        raise NotImplementedError("Not supported: norm_ft_scores")
-        # log(f'Performing FT all scores normalization...')
-        # normalize_scores_only(prism_data_list)
-        # log(f'done!')
-
     data_count = int(CFG['fine_tuning_data_creation']['data_count'])
     log(f'{data_count=}')
 
@@ -100,13 +93,10 @@ def create_fine_tune_diff_splits(pname_to_seq_embedding, min_max_eval_vs=None):
     assert len(eval_split) == 1
 
     # --- create FT normalization per dataset ---
-    eval_quantile_transformer = None
-    norm_ft_scores = int(CFG['fine_tuning_data_creation']['normalize_scores'])
-    if norm_ft_scores == 2:
-        log(f'Performing FT ds scores normalization...')
-        eval_quantile_transformer = normalize_scores_ds(train_split[0])
-        normalize_scores_ds(eval_split[0])  # no need to return transformer here
-        log(f'done!')
+    log(f'Performing FT ds scores normalization...')
+    eval_quantile_transformer = normalize_scores_ds(train_split[0])
+    normalize_scores_ds(eval_split[0])  # no need to return transformer here
+    log(f'done!')
 
     return eval_split, train_split, eval_quantile_transformer
 
