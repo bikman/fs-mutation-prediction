@@ -33,8 +33,6 @@ def train_prism_fine_tune_multi_sets(parameters, log):
     result = TrainResult()
     result.test_result = TestResult()
 
-    batch_norm = int(CFG['flow_fine_tune']['batch_norm'])
-    log(f'{batch_norm=}')
     # --- Uncomment to pre-save model during Fine-Tuning flow ---
     # if parameters.patience is not None:
     #     torch.save(parameters.model.state_dict(), parameters.model_path)
@@ -60,15 +58,6 @@ def train_prism_fine_tune_multi_sets(parameters, log):
                     emb_sector = emb_sector.to(DEVICE, dtype=torch.float)
                     emb_diff = emb_diff.to(DEVICE, dtype=torch.float)
                     target = score.to(DEVICE, dtype=torch.float)
-                    # ---
-                    if batch_norm == 1:
-                        if len(target) < NUM_QUANTILES:
-                            continue
-                        target = normalize_tensor(target)
-                        if torch.isnan(target).any():
-                            log(f'train_prism_fine_tune_multi_sets: Train FT: NaN is found in target: {target.size(dim=0)}')
-                            continue
-                    # ---
                     target2 = bin_id.to(DEVICE, dtype=torch.float)
                     parameters.optimizer.zero_grad()
                     y_hat = parameters.model(pid, pos, all_deltas, pos_arr, emb_sector, emb_diff)
@@ -116,15 +105,6 @@ def train_prism_fine_tune_multi_sets(parameters, log):
                     emb_sector = emb_sector.to(DEVICE, dtype=torch.float)
                     emb_diff = emb_diff.to(DEVICE, dtype=torch.float)
                     target = score.to(DEVICE, dtype=torch.float)
-                    # ---
-                    if batch_norm == 1:
-                        if len(target) < NUM_QUANTILES:
-                            continue
-                        target = normalize_tensor(target)
-                        if torch.isnan(target).any():
-                            log(f'train_prism_fine_tune_multi_sets: Eval FT: NaN is found in target: {target.size(dim=0)}')
-                            continue
-                    # ---
                     target2 = bin_id.to(DEVICE, dtype=torch.float)
                     y_hat = parameters.model(pid, pos, all_deltas, pos_arr, emb_sector, emb_diff)
                     y_hat = y_hat.squeeze(dim=-1)
@@ -199,9 +179,6 @@ def train_prism_scores_multi_sets(parameters, log):
     if parameters.patience is not None:
         torch.save(parameters.model.state_dict(), parameters.model_path)
 
-    batch_norm = int(CFG['flow_train']['batch_norm'])
-    log(f'{batch_norm=}')
-
     # --- epochs loop ---
     for i in range(parameters.epochs):
         log('-' * 30)
@@ -242,15 +219,6 @@ def train_prism_scores_multi_sets(parameters, log):
                     emb_sector = emb_sector.to(DEVICE, dtype=torch.float)
                     emb_diff = emb_diff.to(DEVICE, dtype=torch.float)
                     target = score.to(DEVICE, dtype=torch.float)
-                    # ---
-                    if batch_norm == 1:
-                        if len(target) < NUM_QUANTILES:
-                            continue
-                        target = normalize_tensor(target)
-                        if torch.isnan(target).any():
-                            log(f'train_prism_scores_multi_sets: Train: NaN is found in target: {target.size(dim=0)}')
-                            continue
-                    # ---
                     target2 = bin_id.to(DEVICE, dtype=torch.float)
                     parameters.optimizer.zero_grad()
                     y_hat = parameters.model(pid, pos, all_deltas, pos_arr, emb_sector, emb_diff)
@@ -292,15 +260,6 @@ def train_prism_scores_multi_sets(parameters, log):
                         emb_sector = emb_sector.to(DEVICE, dtype=torch.float)
                         emb_diff = emb_diff.to(DEVICE, dtype=torch.float)
                         target = score.to(DEVICE, dtype=torch.float)
-                        # ---
-                        if batch_norm == 1:
-                            if len(target) < NUM_QUANTILES:
-                                continue
-                            target = normalize_tensor(target)
-                            if torch.isnan(target).any():
-                                log(f'train_prism_scores_multi_sets: Validation: NaN is found in target: {target.size(dim=0)}')
-                                continue
-                        # ---
                         target2 = bin_id.to(DEVICE, dtype=torch.float)
                         y_hat = parameters.model(pid, pos, all_deltas, pos_arr, emb_sector, emb_diff)
                         y_hat = y_hat.squeeze(dim=-1)
@@ -437,9 +396,6 @@ def eval_prism_scores_multi_sets(parameters, log):
     src_indices = np.array([])
     dst_indices = np.array([])
 
-    batch_norm = int(CFG['flow_train']['batch_norm'])
-    log(f'{batch_norm=}')
-
     with torch.no_grad():
         for t, loader in enumerate(parameters.loaders_list):
             log(f'Loader:{t}')
@@ -453,20 +409,9 @@ def eval_prism_scores_multi_sets(parameters, log):
                     emb_sector = emb_sector.to(DEVICE, dtype=torch.float)
                     emb_diff = emb_diff.to(DEVICE, dtype=torch.float)
                     target = score.to(DEVICE, dtype=torch.float)
-                    # ---
-                    if batch_norm == 1:
-                        if len(target) < NUM_QUANTILES:
-                            continue
-                        target = normalize_tensor(target)
-                        if torch.isnan(target).any():
-                            log(f'eval_prism_scores_multi_sets: NaN is found in target: {target.size(dim=0)}')
-                            continue
-                    # ---
-                    target2 = bin_id.to(DEVICE, dtype=torch.float)
                     y_hat = parameters.model(pid, pos, all_deltas, pos_arr, emb_sector, emb_diff)
                     y_hat = y_hat.squeeze(dim=-1)
                     y_hat1 = y_hat[:, 0]
-                    y_hat2 = y_hat[:, 1]
                     true_values = np.append(true_values, target.cpu().numpy())
                     orig_true_values = np.append(orig_true_values, score_orig.cpu().numpy())
                     pred_values = np.append(pred_values, y_hat1.cpu().numpy())

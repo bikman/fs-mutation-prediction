@@ -55,7 +55,6 @@ def main():
     log(f"{CFG['fine_tuning_data_creation']['data_count']=}")
     log(f"{CFG['fine_tuning_data_creation']['normalize_scores']=}")
     log(f"{CFG['fine_tuning_data_creation']['normalize_deltas']=}")
-    log(f"{CFG['flow_fine_tune']['batch_norm']=}")
     log('=' * 100)
 
     loops = int(CFG['flow_fine_tune']['loops'])
@@ -208,7 +207,6 @@ if __name__ == '__main__':
     parser.add_argument('-data_count', type=str, help='Number of mutations to run fine tuning', required=False)
     parser.add_argument('-norm_scores', type=str, help='Normalize scores for fine-tuning', required=False)
     parser.add_argument('-norm_deltas', type=str, help='Normalize deltas for fine-tuning', required=False)
-    parser.add_argument('-batch_norm', type=int, help='Normalize data per batch for fine-tuning', required=False)
     args = parser.parse_args()
 
     if args.prot_set is not None:
@@ -229,8 +227,7 @@ if __name__ == '__main__':
         CFG['fine_tuning_data_creation']['normalize_scores'] = str(args.norm_scores)
     if args.norm_deltas is not None:
         CFG['fine_tuning_data_creation']['normalize_deltas'] = str(args.norm_deltas)
-    if args.batch_norm is not None:
-        CFG['flow_fine_tune']['batch_norm'] = str(args.batch_norm)
+
 
     # NOTE: print command line args CFG inside main
 
