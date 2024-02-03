@@ -6,6 +6,12 @@ The code for quantitative prediction of single point mutations impact on experim
 
 Data preprocessing is needed to run the model training.
 
+EMS embedder files location must be specified for processing the sequence embeddings. The paths are defined in **utils.py**.
+
+![image](https://github.com/bikman/fs-mutation-prediction/assets/82976389/543804b9-3b0a-4736-8e42-d79b083c202e)
+
+The files can be downloaded from here: [Model ESM1b](https://dl.fbaipublicfiles.com/fair-esm/models/esm1b_t33_650M_UR50S.pt) and [Regression weights ESM1b](https://dl.fbaipublicfiles.com/fair-esm/regression/esm1b_t33_650M_UR50S-contact-regression.pt)
+
 Run data creation script with argument specifying where to put the resulted dumps. Each dump file contains all the protein mutations, scores and embeddings.
 
 ```
