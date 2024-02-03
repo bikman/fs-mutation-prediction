@@ -39,6 +39,7 @@ run_full_flow.py -ep [X]
 
 Wild type and mutated sequence represetnations are generated using ESM-1b model [Rao et al. 2021](https://www.biorxiv.org/content/10.1101/2021.02.12.430858v2) 
 (ICML'21 version, June 2021). 
+
 More info is [here](https://github.com/facebookresearch/esm)
 
 Pretrained LLM model (1.3Gb) is [here](https://dl.fbaipublicfiles.com/fair-esm/models/esm_msa1b_t12_100M_UR50S.pt), other file (contact regression) can be found in 'esm1b_msa' folder.
