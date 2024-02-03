@@ -54,7 +54,6 @@ def main():
     log(f"{CFG['fine_tuning_data_creation']['add_max_v']=}")
     log(f"{CFG['fine_tuning_data_creation']['data_count']=}")
     log(f"{CFG['fine_tuning_data_creation']['normalize_scores']=}")
-    log(f"{CFG['fine_tuning_data_creation']['normalize_deltas']=}")
     log('=' * 100)
 
     loops = int(CFG['flow_fine_tune']['loops'])
@@ -206,7 +205,6 @@ if __name__ == '__main__':
     parser.add_argument('-alpha', type=float, help='Parameter coefficient for loss', required=False)
     parser.add_argument('-data_count', type=str, help='Number of mutations to run fine tuning', required=False)
     parser.add_argument('-norm_scores', type=str, help='Normalize scores for fine-tuning', required=False)
-    parser.add_argument('-norm_deltas', type=str, help='Normalize deltas for fine-tuning', required=False)
     args = parser.parse_args()
 
     if args.prot_set is not None:
@@ -225,8 +223,6 @@ if __name__ == '__main__':
         CFG['fine_tuning_data_creation']['data_count'] = str(args.data_count)
     if args.norm_scores is not None:
         CFG['fine_tuning_data_creation']['normalize_scores'] = str(args.norm_scores)
-    if args.norm_deltas is not None:
-        CFG['fine_tuning_data_creation']['normalize_deltas'] = str(args.norm_deltas)
 
 
     # NOTE: print command line args CFG inside main

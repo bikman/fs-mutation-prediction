@@ -74,13 +74,6 @@ def create_fine_tune_diff_splits(pname_to_seq_embedding, min_max_eval_vs=None):
         # normalize_scores_only(prism_data_list)
         # log(f'done!')
 
-    norm_ft_dds = int(CFG['fine_tuning_data_creation']['normalize_deltas'])
-    if norm_ft_dds == 1:
-        raise NotImplementedError("Not supported: norm_ft_dds")
-        # log(f'Performing FT deltas normalization...')
-        # normalize_deltas_only(prism_data_list)
-        # log(f'done!')
-
     data_count = int(CFG['fine_tuning_data_creation']['data_count'])
     log(f'{data_count=}')
 

@@ -93,8 +93,6 @@ def main():
     log(f"{CFG['flow_train']['alpha']=}")
     log(f"{CFG['flow_data_creation']['normalize_scores']=}")
     log(f"{CFG['fine_tuning_data_creation']['normalize_scores']=}")
-    log(f"{CFG['flow_data_creation']['normalize_deltas']=}")
-    log(f"{CFG['fine_tuning_data_creation']['normalize_deltas']=}")
     log('=' * 100)
 
     log('=' * 100)
@@ -251,7 +249,6 @@ if __name__ == '__main__':
     parser.add_argument('-alpha', type=float, help='Parameter coefficient for loss', required=False)
     parser.add_argument('-norm_scores', type=int, help='Normalize scores train & eval', required=False)
     parser.add_argument('-norm_scores_ft', type=int, help='Normalize scores FT', required=False)
-    parser.add_argument('-norm_deltas', type=int, help='Normalize deltas', required=False)
     args = parser.parse_args()
 
     if args.prot_set is not None:
@@ -276,9 +273,6 @@ if __name__ == '__main__':
         CFG['flow_data_creation']['normalize_scores'] = str(args.norm_scores)
     if args.norm_scores_ft is not None:
         CFG['fine_tuning_data_creation']['normalize_scores'] = str(args.norm_scores_ft)
-    if args.norm_deltas is not None:
-        CFG['flow_data_creation']['normalize_deltas'] = str(args.norm_deltas)
-        CFG['fine_tuning_data_creation']['normalize_deltas'] = str(args.norm_deltas)
 
 
 

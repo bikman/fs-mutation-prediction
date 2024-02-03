@@ -350,13 +350,6 @@ def create_diff_emb_splits():
         normalize_scores_only(prism_data_list)
         log(f'done!')
 
-    normalize_dds_enabled = int(CFG['flow_data_creation']['normalize_deltas'])
-    log(f'{normalize_dds_enabled=}')
-    if normalize_dds_enabled == 1:
-        log(f'Performing train deltas normalization...')
-        normalize_deltas_only(prism_data_list)
-        log(f'done!')
-
     total_variants_count = sum([len(d.variants) for d in prism_data_list])
     log(f'{total_variants_count=}')
 
