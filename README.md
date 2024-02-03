@@ -52,3 +52,9 @@ MAVE data files are included in the 'mave' folder.
 
 The complete project is in Python plus PyTorch and it is in 'code' folder.
 
+### Configuration files
+
+Several configuration files are provided for specifying various parameters of the system.
+
+![image](https://github.com/bikman/fs-mutation-prediction/assets/82976389/b1720e55-acbb-4378-85c5-88797530ee8c)
+
