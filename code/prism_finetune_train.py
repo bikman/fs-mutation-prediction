@@ -70,7 +70,7 @@ def fill_fine_tune_train_params(model, report_path):
     train_params.epochs = epochs
     train_params.loader_pairs = []
     train_params.bins = 10
-    train_params.alpha = float(CFG['flow_fine_tune']['alpha'])
+    train_params.alpha = 1
     log(f'Fine tune alpha: {train_params.alpha}')
     return train_params
 

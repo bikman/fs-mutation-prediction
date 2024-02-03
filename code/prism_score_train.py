@@ -222,7 +222,7 @@ def fill_train_parameters(model, report_path):
     train_params.patience = int(CFG['flow_train']['patience'])
     train_params.loader_pairs = []
     train_params.bins = 10
-    train_params.alpha = float(CFG['flow_train']['alpha'])
+    train_params.alpha = 1
     return train_params
 
 
